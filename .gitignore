@@ -1,0 +1,11 @@
+~$*
+.idea
+.gitmodules
+*.mmdb
+*.exe
+*.DS*
+go.sum
+.vscode
+**/log/**
+config.yaml
+shandianyu-minisdk-mailer

@@ -1,0 +1,45 @@
+package mail_parser
+
+import (
+	"regexp"
+	"shandianyu-minisdk-mailer/entity"
+	"shandianyu-minisdk-mailer/service"
+	"strings"
+)
+
+// 被拒
+type noticedIssueMailParser struct{}
+
+func init() {
+	registerImplement(&noticedIssueMailParser{})
+}
+
+func (o *noticedIssueMailParser) checkTitle(title string) bool {
+	return strings.Contains(title, `We noticed an issue with your submission`)
+}
+
+func (o *noticedIssueMailParser) checkKeyword(bodyText string) bool {
+	return strings.Contains(bodyText, "noticed an issue")
+}
+
+func (o *noticedIssueMailParser) parse(bodyText string) (*entity.Game, *entity.GameMail) {
+	oneGame := service.GameService.GetByName(o.extractAppName(bodyText))
+	if oneGame == nil {
+		return nil, nil
+	}
+	return oneGame, &entity.GameMail{
+		Symbol:     oneGame.Symbol,
+		AppVersion: findAuditingVersion(oneGame),
+		Status:     "被拒",
+		Content:    bodyText,
+	}
+}
+
+func (o *noticedIssueMailParser) extractAppName(body string) string {
+	re := regexp.MustCompile(`(?i)App\s*Name:\s*(.+?)Submission\s+ID:`)
+	matches := re.FindStringSubmatch(body)
+	if len(matches) > 1 {
+		return strings.TrimSpace(matches[1])
+	}
+	return ""
+}

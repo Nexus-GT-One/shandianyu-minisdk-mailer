@@ -1,0 +1,34 @@
+# 把文件名的sample.去掉，改成实际的参数，就可以使用
+
+# 环境变量
+env: dev
+
+# 服务配置
+shandianyu-minisdk-dashboard-url: https://xxxxxxxxx.com
+
+# 应用配置
+application:
+  name: shandianyu-minisdk-mailer
+
+# 服务器配置
+server:
+  port: 4001
+  prefix: /api/v1
+
+data:
+  # 数据库配置
+  mongodb:
+    uri: mongodb://user:password@127.0.0.1:27017/dbname
+
+  # geoip2数据库配置
+  geoip2:
+    path: /srv/app
+
+# 日志配置
+logger:
+  path: ./log
+  level: INFO
+
+# 飞书机器人
+feishu:
+  webhook: https://open.feishu.cn/open-apis/bot/v2/hook/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
