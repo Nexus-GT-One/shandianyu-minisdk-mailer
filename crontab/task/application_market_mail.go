@@ -361,7 +361,7 @@ func run() {
 **邮件标题**：{{.title}}
 **邮件内容**：
 {{.content}}`, data)
-			feishu.AdminRobot().SendRobotInteractive(title, content)
+			feishu.MailRobot().SendRobotInteractive(title, content)
 		}
 	}
 }
