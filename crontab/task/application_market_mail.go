@@ -33,7 +33,7 @@ func init() {
 
 	for {
 		run()
-		time.Sleep(1 * time.Second)
+		time.Sleep(1 * time.Minute)
 	}
 }
 
