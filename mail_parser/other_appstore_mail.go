@@ -33,7 +33,7 @@ func (o *OtherAppstoreMailParser) parse(bodyText string) (*entity.Game, *entity.
 	return oneGame, &entity.GameMail{
 		Symbol:     oneGame.Symbol,
 		AppVersion: o.findAuditingVersion(bodyText),
-		Status:     "other appstore mail",
+		Status:     "未知邮件类型",
 		Content:    bodyText,
 	}
 }
