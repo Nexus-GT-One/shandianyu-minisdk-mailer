@@ -19,7 +19,7 @@ func (o *wasRejectedMailParser) checkFrom(from string) bool {
 }
 
 func (o *wasRejectedMailParser) checkTitle(title string) bool {
-	return strings.Contains(title, `Your App Review Feedback`)
+	return strings.Contains(title, "Your App Review Feedback")
 }
 
 func (o *wasRejectedMailParser) checkKeyword(bodyText string) bool {
@@ -40,10 +40,10 @@ func (o *wasRejectedMailParser) parse(bodyText string) (*entity.Game, *entity.Ga
 }
 
 func (o *wasRejectedMailParser) extractAppName(body string) string {
-	re := regexp.MustCompile(`(?i)Changes needed\.([A-Z][a-zA-Z]*(?: [A-Z][a-zA-Z]*)*)iOS`)
+	re := regexp.MustCompile(`(?m)^Changes\sneeded\.\s*\n([A-Za-z\s]+)\s*$`)
 	matches := re.FindStringSubmatch(body)
 	if len(matches) > 1 {
-		return strings.TrimSpace(matches[1])
+		return strings.TrimSpace(strings.ReplaceAll(matches[1], "iOS", ""))
 	}
 	return ""
 }

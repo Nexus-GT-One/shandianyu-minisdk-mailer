@@ -40,7 +40,7 @@ func (o *noticedIssueMailParser) parse(bodyText string) (*entity.Game, *entity.G
 }
 
 func (o *noticedIssueMailParser) extractAppName(body string) string {
-	re := regexp.MustCompile(`(?i)App\s*Name:\s*(.+?)Submission\s+ID:`)
+	re := regexp.MustCompile(`App Name:\s*(.*?)\s*Submission ID`)
 	matches := re.FindStringSubmatch(body)
 	if len(matches) > 1 {
 		return strings.TrimSpace(matches[1])

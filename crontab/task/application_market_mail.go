@@ -14,6 +14,7 @@ import (
 	"io/ioutil"
 	"mime"
 	"regexp"
+	"shandianyu-minisdk-mailer/entity"
 	"shandianyu-minisdk-mailer/mail_parser"
 	"shandianyu-minisdk-mailer/service"
 	"shandianyu-minisdk-mailer/thirdparty/feishu"
@@ -245,6 +246,7 @@ func run() {
 		totalPages++
 	}
 
+	gameMails := make([]*entity.GameMail, 0)
 	for page := 1; page <= totalPages; page++ {
 		logger.Info("==== 第 %d 页 / 共 %d 页 ====\n", page, totalPages)
 		start := (page - 1) * pageSize
@@ -300,14 +302,14 @@ func run() {
 			// 如果已经读取过的邮件就不需要再读取了
 			if lastMailIndex >= dateInBeijing.UnixMilli() {
 				logger.Info("邮件已经读完了，最新游标：%v", dateInBeijing.Format(time.DateTime))
-				return
+				break
 			}
 
 			ms5String := secretutil.MD5(bodyText)
 			existsGameMail := service.GameMailService.FindByMd5(ms5String)
 			if existsGameMail != nil {
 				logger.Info("邮件【%s】已入库", subject)
-				return
+				continue
 			}
 
 			// 打印一下邮件
@@ -329,40 +331,49 @@ func run() {
 				oneGame, newGameMail = mail_parser.ParseOtherMail(subject, from, dateInBeijing.Format(time.DateTime), bodyText)
 			}
 
-			// 记录读取游标
-			service.SystemService.SaveLastMailIndex(dateInBeijing.UnixMilli())
-
 			// 如果还是未能识别就跳过
 			if oneGame == nil || newGameMail == nil {
 				continue
 			}
 
-			// 邮件写入数据库
+			// 加上开发者账号
 			newGameMail.Developer = strings.TrimSpace((*arrayutil.First(mailInfo.Envelope.To)).Address())
-			gameDb.InsertOne(*newGameMail)
+			gameMails = append(gameMails, newGameMail)
+		}
+	}
 
-			// 发送消息
-			title := fmt.Sprintf("游戏 %s 的邮件消息", oneGame.Symbol)
-			data := map[string]string{
-				"status":     newGameMail.Status,
-				"developer":  newGameMail.Developer,
-				"appVersion": newGameMail.AppVersion,
-				"time":       dateInBeijing.Format(time.DateTime),
-				"title":      newGameMail.Title,
-				"content":    newGameMail.Content,
-			}
-			content := stringutil.TemplateParse(`**游戏状态**：{{.status}}
+	// 重新排序，保证是先来后到
+	sort.Slice(gameMails, func(i, j int) bool {
+		return gameMails[i].ReceiveTime >= gameMails[i].ReceiveTime
+	})
+	for _, newGameMail := range gameMails {
+		// 邮件写入数据库
+		gameDb.InsertOne(*newGameMail)
+
+		// 发送消息
+		title := fmt.Sprintf("游戏 %s 的邮件消息", newGameMail.Symbol)
+		data := map[string]string{
+			"status":     newGameMail.Status,
+			"developer":  newGameMail.Developer,
+			"appVersion": newGameMail.AppVersion,
+			"time":       time.UnixMilli(newGameMail.ReceiveTime).Format(time.DateTime),
+			"title":      newGameMail.Title,
+			"content":    newGameMail.Content,
+		}
+		content := stringutil.TemplateParse(`**游戏状态**：{{.status}}
 **游戏版本**：{{.appVersion}}
 **收件时间**：{{.time}}
 **邮件标题**：{{.title}}
 **邮件内容**：
 {{.content}}`, data)
 
-			if isProd {
-				feishu.MailRobot().SendRobotInteractive(title, content)
-			} else {
-				feishu.AdminRobot().SendRobotInteractive(title, content)
-			}
+		if isProd {
+			feishu.MailRobot().SendRobotInteractive(title, content)
+		} else {
+			feishu.AdminRobot().SendRobotInteractive(title, content)
 		}
+
+		// 记录读取游标
+		service.SystemService.SaveLastMailIndex(newGameMail.ReceiveTime)
 	}
 }
