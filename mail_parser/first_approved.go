@@ -40,10 +40,10 @@ func (o *firstApprovedMailParser) parse(bodyText string) (*entity.Game, *entity.
 }
 
 func (o *firstApprovedMailParser) extractAppName(body string) string {
-	re := regexp.MustCompile(`(?i)Congratulations!([A-Z][a-zA-Z]*(?: [A-Z][a-zA-Z]*)*)iOS`)
-	match := re.FindStringSubmatch(body)
-	if len(match) > 1 {
-		return strings.TrimSpace(match[1])
+	re := regexp.MustCompile(`(?m)^Congratulations!\s*\n([A-Za-z\s]+)\s*$`)
+	matches := re.FindStringSubmatch(body)
+	if len(matches) > 1 {
+		return strings.TrimSpace(strings.ReplaceAll(matches[1], "iOS", ""))
 	}
 	return ""
 }

@@ -40,7 +40,7 @@ func (o *reviewApprovedMailParser) parse(bodyText string) (*entity.Game, *entity
 }
 
 func (o *reviewApprovedMailParser) extractAppName(body string) string {
-	re := regexp.MustCompile(`App Name:\s*(.*?)https://`)
+	re := regexp.MustCompile(`(?m)^App\sName:\s([A-Za-z\s]+)$`)
 	match := re.FindStringSubmatch(body)
 	if len(match) > 1 {
 		return strings.TrimSpace(match[1])
