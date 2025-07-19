@@ -14,6 +14,10 @@ func init() {
 	registerImplement(&noticedIssueMailParser{})
 }
 
+func (o *noticedIssueMailParser) checkFrom(from string) bool {
+	return strings.Contains(from, "App Store Connect")
+}
+
 func (o *noticedIssueMailParser) checkTitle(title string) bool {
 	return strings.Contains(title, `We noticed an issue with your submission`)
 }

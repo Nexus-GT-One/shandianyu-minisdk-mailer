@@ -17,6 +17,12 @@ func newGameService() *gameService {
 
 func (a *gameService) GetByName(name string) *entity.Game {
 	query := bson.D{{"name", name}}
-	ctx, cursor := db.Find(query, entity.Game{})
+	ctx, cursor := db.FindOne(query, entity.Game{})
+	return mongodb.DecodeOne(ctx, cursor, entity.Game{})
+}
+
+func (a *gameService) GetByDeveloperEmail(developerEmail string) *entity.Game {
+	query := bson.D{{"developerEmail", developerEmail}}
+	ctx, cursor := db.FindOne(query, entity.Game{})
 	return mongodb.DecodeOne(ctx, cursor, entity.Game{})
 }

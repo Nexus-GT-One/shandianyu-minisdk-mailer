@@ -14,6 +14,10 @@ func init() {
 	registerImplement(&verifiedEuropeanUnionSuccessMailParser{})
 }
 
+func (o *verifiedEuropeanUnionSuccessMailParser) checkFrom(from string) bool {
+	return strings.Contains(from, "App Store Connect")
+}
+
 func (o *verifiedEuropeanUnionSuccessMailParser) checkTitle(title string) bool {
 	return strings.Contains(title, "Your trader contact information was verified")
 }

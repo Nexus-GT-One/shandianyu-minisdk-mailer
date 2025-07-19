@@ -14,6 +14,10 @@ func init() {
 	registerImplement(&suspectedBanAccountMailParser{})
 }
 
+func (o *suspectedBanAccountMailParser) checkFrom(from string) bool {
+	return strings.Contains(from, "App Store Connect")
+}
+
 func (o *suspectedBanAccountMailParser) checkTitle(title string) bool {
 	return strings.Contains(title, `You have a message from App Review`)
 }

@@ -14,6 +14,10 @@ func init() {
 	registerImplement(&wasRejectedMailParser{})
 }
 
+func (o *wasRejectedMailParser) checkFrom(from string) bool {
+	return strings.Contains(from, "App Store Connect")
+}
+
 func (o *wasRejectedMailParser) checkTitle(title string) bool {
 	return strings.Contains(title, `Your App Review Feedback`)
 }

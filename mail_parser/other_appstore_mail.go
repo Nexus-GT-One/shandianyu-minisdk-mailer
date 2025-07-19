@@ -1,0 +1,57 @@
+package mail_parser
+
+import (
+	"regexp"
+	"shandianyu-minisdk-mailer/entity"
+	"shandianyu-minisdk-mailer/service"
+	"strings"
+)
+
+// 未能识别的苹果邮件类型
+type OtherAppstoreMailParser struct{}
+
+func (o *OtherAppstoreMailParser) checkFrom(from string) bool {
+	return strings.Contains(from, "App Store Connect")
+}
+
+func (o *OtherAppstoreMailParser) checkTitle(title string) bool {
+	return true
+}
+
+func (o *OtherAppstoreMailParser) checkKeyword(bodyText string) bool {
+	return strings.Contains(bodyText, "App Store")
+}
+
+func (o *OtherAppstoreMailParser) parse(bodyText string) (*entity.Game, *entity.GameMail) {
+	oneGame := service.GameService.GetByName(o.extractAppName(bodyText))
+	if oneGame == nil {
+		oneGame = service.GameService.GetByDeveloperEmail(extractDeveloperEmail(bodyText))
+		if oneGame == nil {
+			oneGame = &entity.Game{Symbol: "unknow game"}
+		}
+	}
+	return oneGame, &entity.GameMail{
+		Symbol:     oneGame.Symbol,
+		AppVersion: o.findAuditingVersion(bodyText),
+		Status:     "other appstore mail",
+		Content:    bodyText,
+	}
+}
+
+func (o *OtherAppstoreMailParser) extractAppName(body string) string {
+	re := regexp.MustCompile(`(?m)^(.+)\s*\nApp Apple ID\s+\d+\s*\nVersion\s+([^\s]+)`)
+	match := re.FindStringSubmatch(body)
+	if len(match) > 1 {
+		return strings.TrimSpace(match[1])
+	}
+	return ""
+}
+
+func (o *OtherAppstoreMailParser) findAuditingVersion(body string) string {
+	re := regexp.MustCompile(`(?m)^(.+)\s*\nApp Apple ID\s+\d+\s*\nVersion\s+([^\s]+)`)
+	match := re.FindStringSubmatch(body)
+	if len(match) > 1 {
+		return strings.TrimSpace(match[2])
+	}
+	return ""
+}

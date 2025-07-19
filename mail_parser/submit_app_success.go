@@ -14,6 +14,10 @@ func init() {
 	registerImplement(&submitAppSuccessMailParser{})
 }
 
+func (o *submitAppSuccessMailParser) checkFrom(from string) bool {
+	return strings.Contains(from, "App Store Connect")
+}
+
 func (o *submitAppSuccessMailParser) checkTitle(title string) bool {
 	return strings.Contains(title, "Thank You for Submitting Your App")
 }

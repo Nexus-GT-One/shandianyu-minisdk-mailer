@@ -20,6 +20,7 @@ import (
 	"shandianyu-minisdk-mailer/util/arrayutil"
 	"shandianyu-minisdk-mailer/util/secretutil"
 	"shandianyu-minisdk-mailer/util/stringutil"
+	"shandianyu-minisdk-mailer/util/systemutil"
 	"sort"
 	"strings"
 	"time"
@@ -33,20 +34,7 @@ func init() {
 
 	for {
 		run()
-		time.Sleep(1 * time.Minute)
-	}
-}
-
-// 支持 GBK 和 UTF-8 的 CharsetReader
-func CharsetReader(charset string, input io.Reader) (io.Reader, error) {
-	switch strings.ToLower(charset) {
-	case "gbk", "gb2312", "gb18030":
-		return transform.NewReader(input, simplifiedchinese.GBK.NewDecoder()), nil
-	case "utf-8", "us-ascii":
-		return input, nil
-	default:
-		// 默认不转换，直接返回，可能会乱码
-		return input, nil
+		time.Sleep(systemutil.If(isProd, 10*time.Second, time.Second).(time.Duration))
 	}
 }
 
@@ -318,25 +306,33 @@ func run() {
 			ms5String := secretutil.MD5(bodyText)
 			existsGameMail := service.GameMailService.FindByMd5(ms5String)
 			if existsGameMail != nil {
+				logger.Info("邮件【%s】已入库", subject)
 				return
 			}
 
 			// 打印一下邮件
-			logger.Info("序号: %d\n日期: %s\n收件人: %s\n主题: %s\nmd5: %s\n正文:\n%s\n\n",
+			from := strings.TrimSpace((*arrayutil.First(mailInfo.Envelope.From)).PersonalName)
+			logger.Info("序号: %d\n日期: %s\n发件人: %s\n收件人: %s\n主题: %s\nmd5: %s\n正文:\n%s\n\n",
 				mailInfo.SeqNum,
 				dateInBeijing.Format(time.DateTime),
+				from,
 				strings.TrimSpace((*arrayutil.First(mailInfo.Envelope.To)).Address()),
 				subject,
 				ms5String,
 				bodyText)
 
 			// 解析邮件
-			oneGame, newGameMail := mail_parser.ParseMail(subject, dateInBeijing.Format(time.DateTime), bodyText)
+			oneGame, newGameMail := mail_parser.ParseMail(subject, from, dateInBeijing.Format(time.DateTime), bodyText)
+
+			// 如果用已实现的模板未能识别，就走保底
+			if oneGame == nil || newGameMail == nil {
+				oneGame, newGameMail = mail_parser.ParseOtherMail(subject, from, dateInBeijing.Format(time.DateTime), bodyText)
+			}
 
 			// 记录读取游标
 			service.SystemService.SaveLastMailIndex(dateInBeijing.UnixMilli())
 
-			// 如果不是苹果提审相关的游戏就跳过
+			// 如果还是未能识别就跳过
 			if oneGame == nil || newGameMail == nil {
 				continue
 			}
@@ -361,7 +357,12 @@ func run() {
 **邮件标题**：{{.title}}
 **邮件内容**：
 {{.content}}`, data)
-			feishu.MailRobot().SendRobotInteractive(title, content)
+
+			if isProd {
+				feishu.MailRobot().SendRobotInteractive(title, content)
+			} else {
+				feishu.AdminRobot().SendRobotInteractive(title, content)
+			}
 		}
 	}
 }

@@ -1,6 +1,7 @@
 package mail_parser
 
 import (
+	"regexp"
 	"runtime/debug"
 	"shandianyu-minisdk-mailer/entity"
 	"shandianyu-minisdk-mailer/util/secretutil"
@@ -14,27 +15,41 @@ import (
 var mailParserImplementMap = make(map[string]IMailParser)
 
 type IMailParser interface {
+	checkFrom(from string) bool
 	checkTitle(title string) bool
 	checkKeyword(bodyText string) bool
 	parse(bodyText string) (*entity.Game, *entity.GameMail)
 }
 
-func ParseMail(title, receiveTime, bodyText string) (*entity.Game, *entity.GameMail) {
+func ParseMail(title, from, receiveTime, bodyText string) (*entity.Game, *entity.GameMail) {
 	for _, handler := range mailParserImplementMap {
-		if !handler.checkTitle(title) || !handler.checkKeyword(bodyText) {
+		oneGame, gameMail := baseParseMail(handler, title, from, receiveTime, bodyText)
+		if oneGame == nil || gameMail == nil {
 			continue
 		}
-		oneGame, gameMail := handler.parse(bodyText)
-		gameMail.Title = title
-		gameMail.MD5 = secretutil.MD5(bodyText)
-		beijingLocation, _ := time.LoadLocation("Asia/Shanghai")
-		createTime, _ := time.ParseInLocation(time.DateTime, receiveTime, beijingLocation)
-		gameMail.ReceiveTime = createTime.UnixMilli()
-		gameMail.Content = strings.TrimSpace(strings.ReplaceAll(gameMail.Content, "\n", "<br>")) // 换行符换成<br>方便在后台显示
 		return oneGame, gameMail
 	}
 
 	return nil, nil
+}
+
+func ParseOtherMail(title, from, receiveTime, bodyText string) (*entity.Game, *entity.GameMail) {
+	return baseParseMail(&OtherAppstoreMailParser{}, title, from, receiveTime, bodyText)
+}
+
+func baseParseMail(handler IMailParser, title, from, receiveTime, bodyText string) (*entity.Game, *entity.GameMail) {
+	if !handler.checkFrom(from) || !handler.checkTitle(title) || !handler.checkKeyword(bodyText) {
+		return nil, nil
+	}
+
+	oneGame, gameMail := handler.parse(bodyText)
+	gameMail.Title = title
+	gameMail.MD5 = secretutil.MD5(bodyText)
+	beijingLocation, _ := time.LoadLocation("Asia/Shanghai")
+	createTime, _ := time.ParseInLocation(time.DateTime, receiveTime, beijingLocation)
+	gameMail.ReceiveTime = createTime.UnixMilli()
+	gameMail.Content = strings.TrimSpace(strings.ReplaceAll(gameMail.Content, "\n", "<br>")) // 换行符换成<br>方便在后台显示
+	return oneGame, gameMail
 }
 
 func registerImplement(instance any) {
@@ -55,6 +70,16 @@ func findAuditingVersion(oneGame *entity.Game) string {
 			continue
 		}
 		return appVersion
+	}
+
+	return ""
+}
+
+func extractDeveloperEmail(body string) string {
+	re := regexp.MustCompile(`(?i)email:\s*([\w\.-]+@[\w\.-]+\.\w+)`)
+	match := re.FindStringSubmatch(body)
+	if len(match) > 1 {
+		return strings.TrimSpace(match[1])
 	}
 
 	return ""

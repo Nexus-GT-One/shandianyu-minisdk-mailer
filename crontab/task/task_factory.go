@@ -1,7 +1,9 @@
 package task
 
 import (
+	"reflect"
 	"runtime/debug"
+	"shandianyu-minisdk-mailer/provider/config"
 	loggerFactory "shandianyu-minisdk-mailer/provider/logger"
 	"shandianyu-minisdk-mailer/provider/mongodb"
 	"strings"
@@ -12,6 +14,7 @@ var taskMap sync.Map
 var logger = loggerFactory.GetLogger()
 var gameDb = mongodb.GetInstance()
 var logDb = mongodb.GetLoggingInstance()
+var isProd = reflect.DeepEqual("prod", config.GetString("env"))
 
 type Task struct {
 	Crontab  string

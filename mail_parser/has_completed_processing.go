@@ -14,6 +14,10 @@ func init() {
 	registerImplement(&hasCompletedProcessingMailParser{})
 }
 
+func (o *hasCompletedProcessingMailParser) checkFrom(from string) bool {
+	return strings.Contains(from, "App Store Connect")
+}
+
 func (o *hasCompletedProcessingMailParser) checkTitle(title string) bool {
 	return strings.Contains(title, "has completed processing")
 }
