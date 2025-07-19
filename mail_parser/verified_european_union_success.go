@@ -1,9 +1,7 @@
 package mail_parser
 
 import (
-	"regexp"
 	"shandianyu-minisdk-mailer/entity"
-	"shandianyu-minisdk-mailer/service"
 	"strings"
 )
 
@@ -27,23 +25,8 @@ func (o *verifiedEuropeanUnionSuccessMailParser) checkKeyword(bodyText string) b
 }
 
 func (o *verifiedEuropeanUnionSuccessMailParser) parse(bodyText string) (*entity.Game, *entity.GameMail) {
-	oneGame := service.GameService.GetByName(o.extractAppName(bodyText))
-	if oneGame == nil {
-		return nil, nil
+	return nil, &entity.GameMail{
+		Status:  "欧盟认证成功",
+		Content: bodyText,
 	}
-	return oneGame, &entity.GameMail{
-		Symbol:     oneGame.Symbol,
-		AppVersion: findAuditingVersion(oneGame),
-		Status:     "欧盟认证成功",
-		Content:    bodyText,
-	}
-}
-
-func (o *verifiedEuropeanUnionSuccessMailParser) extractAppName(body string) string {
-	re := regexp.MustCompile(`(?m)^We've received your app for review\.\s*\n(.+?)\n`)
-	match := re.FindStringSubmatch(body)
-	if len(match) > 1 {
-		return strings.TrimSpace(match[1])
-	}
-	return ""
 }

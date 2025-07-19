@@ -154,7 +154,7 @@ func (f *FeishuRobot) SendRobotInteractive(title, content string) {
 			},
 		},
 	})
-	systemutil.Goroutine(func() { httputil.Post(f.url, make(map[string]string), body, &map[string]any{}) })
+	httputil.Post(f.url, make(map[string]string), body, &map[string]any{})
 }
 
 // https://open.feishu.cn/document/server-docs/contact-v3/user/batch_get_id?appId=cli_a72420c4753fd00e

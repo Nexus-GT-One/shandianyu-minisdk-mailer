@@ -14,6 +14,7 @@ import (
 	"io/ioutil"
 	"mime"
 	"regexp"
+	"runtime/debug"
 	"shandianyu-minisdk-mailer/entity"
 	"shandianyu-minisdk-mailer/mail_parser"
 	"shandianyu-minisdk-mailer/service"
@@ -166,6 +167,19 @@ func removeHTMLAndCSS(input string) string {
 }
 
 func run() {
+	defer func() {
+		if err := recover(); err != nil {
+			title := "邮件解析错误"
+			content := fmt.Sprintf("%v\n%v\n", err, string(debug.Stack()))
+			logger.Error(fmt.Sprintf("%v\n%v", title, content))
+			if isProd {
+				feishu.MailRobot().SendRobotInteractive(title, content)
+			} else {
+				feishu.AdminRobot().SendRobotInteractive(title, content)
+			}
+		}
+	}()
+
 	// 新浪邮箱
 	serverName := "imap.sina.com"
 	port := 993
@@ -313,22 +327,23 @@ func run() {
 			}
 
 			// 打印一下邮件
+			to := strings.TrimSpace((*arrayutil.First(mailInfo.Envelope.To)).Address())
 			from := strings.TrimSpace((*arrayutil.First(mailInfo.Envelope.From)).PersonalName)
 			logger.Info("序号: %d\n日期: %s\n发件人: %s\n收件人: %s\n主题: %s\nmd5: %s\n正文:\n%s\n\n",
 				mailInfo.SeqNum,
 				dateInBeijing.Format(time.DateTime),
 				from,
-				strings.TrimSpace((*arrayutil.First(mailInfo.Envelope.To)).Address()),
+				to,
 				subject,
 				ms5String,
 				bodyText)
 
 			// 解析邮件
-			oneGame, newGameMail := mail_parser.ParseMail(subject, from, dateInBeijing.Format(time.DateTime), bodyText)
+			oneGame, newGameMail := mail_parser.ParseMail(subject, from, to, dateInBeijing.Format(time.DateTime), bodyText)
 
 			// 如果用已实现的模板未能识别，就走保底
 			if oneGame == nil || newGameMail == nil {
-				oneGame, newGameMail = mail_parser.ParseOtherMail(subject, from, dateInBeijing.Format(time.DateTime), bodyText)
+				oneGame, newGameMail = mail_parser.ParseOtherMail(subject, from, to, dateInBeijing.Format(time.DateTime), bodyText)
 			}
 
 			// 如果还是未能识别就跳过
@@ -337,14 +352,14 @@ func run() {
 			}
 
 			// 加上开发者账号
-			newGameMail.Developer = strings.TrimSpace((*arrayutil.First(mailInfo.Envelope.To)).Address())
+			newGameMail.Developer = to
 			gameMails = append(gameMails, newGameMail)
 		}
 	}
 
 	// 重新排序，保证是先来后到
 	sort.Slice(gameMails, func(i, j int) bool {
-		return gameMails[i].ReceiveTime >= gameMails[i].ReceiveTime
+		return gameMails[i].ReceiveTime < gameMails[j].ReceiveTime
 	})
 	for _, newGameMail := range gameMails {
 		// 邮件写入数据库
@@ -352,6 +367,9 @@ func run() {
 
 		// 发送消息
 		title := fmt.Sprintf("游戏 %s 的邮件消息", newGameMail.Symbol)
+		if len(newGameMail.Symbol) <= 0 {
+			title = "未知的邮件类型消息"
+		}
 		data := map[string]string{
 			"status":     newGameMail.Status,
 			"developer":  newGameMail.Developer,

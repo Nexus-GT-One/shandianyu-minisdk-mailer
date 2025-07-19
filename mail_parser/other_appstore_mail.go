@@ -27,7 +27,7 @@ func (o *OtherAppstoreMailParser) parse(bodyText string) (*entity.Game, *entity.
 	if oneGame == nil {
 		oneGame = service.GameService.GetByDeveloperEmail(extractDeveloperEmail(bodyText))
 		if oneGame == nil {
-			oneGame = &entity.Game{Symbol: "unknow game"}
+			oneGame = &entity.Game{}
 		}
 	}
 	return oneGame, &entity.GameMail{

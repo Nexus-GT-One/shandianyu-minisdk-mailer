@@ -4,6 +4,7 @@ import (
 	"regexp"
 	"runtime/debug"
 	"shandianyu-minisdk-mailer/entity"
+	"shandianyu-minisdk-mailer/service"
 	"shandianyu-minisdk-mailer/util/secretutil"
 	"strings"
 	"time"
@@ -21,9 +22,9 @@ type IMailParser interface {
 	parse(bodyText string) (*entity.Game, *entity.GameMail)
 }
 
-func ParseMail(title, from, receiveTime, bodyText string) (*entity.Game, *entity.GameMail) {
+func ParseMail(title, from, to, receiveTime, bodyText string) (*entity.Game, *entity.GameMail) {
 	for _, handler := range mailParserImplementMap {
-		oneGame, gameMail := baseParseMail(handler, title, from, receiveTime, bodyText)
+		oneGame, gameMail := baseParseMail(handler, title, from, to, receiveTime, bodyText)
 		if oneGame == nil || gameMail == nil {
 			continue
 		}
@@ -33,16 +34,19 @@ func ParseMail(title, from, receiveTime, bodyText string) (*entity.Game, *entity
 	return nil, nil
 }
 
-func ParseOtherMail(title, from, receiveTime, bodyText string) (*entity.Game, *entity.GameMail) {
-	return baseParseMail(&OtherAppstoreMailParser{}, title, from, receiveTime, bodyText)
+func ParseOtherMail(title, from, to, receiveTime, bodyText string) (*entity.Game, *entity.GameMail) {
+	return baseParseMail(&OtherAppstoreMailParser{}, title, from, to, receiveTime, bodyText)
 }
 
-func baseParseMail(handler IMailParser, title, from, receiveTime, bodyText string) (*entity.Game, *entity.GameMail) {
+func baseParseMail(handler IMailParser, title, from, to, receiveTime, bodyText string) (*entity.Game, *entity.GameMail) {
 	if !handler.checkFrom(from) || !handler.checkTitle(title) || !handler.checkKeyword(bodyText) {
 		return nil, nil
 	}
 
 	oneGame, gameMail := handler.parse(bodyText)
+	if oneGame == nil {
+		oneGame = service.GameService.GetByDeveloperEmail(to)
+	}
 	gameMail.Title = title
 	gameMail.MD5 = secretutil.MD5(bodyText)
 	beijingLocation, _ := time.LoadLocation("Asia/Shanghai")

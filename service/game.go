@@ -3,6 +3,7 @@ package service
 import (
 	_ "embed"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"shandianyu-minisdk-mailer/entity"
 	"shandianyu-minisdk-mailer/provider/mongodb"
 )
@@ -23,6 +24,6 @@ func (a *gameService) GetByName(name string) *entity.Game {
 
 func (a *gameService) GetByDeveloperEmail(developerEmail string) *entity.Game {
 	query := bson.D{{"developerEmail", developerEmail}}
-	ctx, cursor := db.FindOne(query, entity.Game{})
+	ctx, cursor := db.Find(query, entity.Game{}, &options.FindOptions{Sort: bson.D{{"_id", -1}}})
 	return mongodb.DecodeOne(ctx, cursor, entity.Game{})
 }
