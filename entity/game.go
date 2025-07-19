@@ -69,6 +69,7 @@ type Game struct {
 	Tester                                       []string                              `bson:"tester"`
 	Producter                                    []string                              `bson:"producter"`
 	DeveloperEmail                               string                                `bson:"developerEmail"`
+	DeveloperEmailConfirm                        bool                                  `bson:"developerEmailConfirm"`
 	CocosScriptKey                               string                                `bson:"cocosScriptKey"`
 	CocosEncryptKey                              string                                `bson:"cocosEncryptKey"`
 	CocosEncryptCode                             string                                `bson:"cocosEncryptCode"`
