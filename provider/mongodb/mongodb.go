@@ -214,7 +214,7 @@ func (m *mongodb) InsertMany(entity ...any) []primitive.ObjectID {
 			fieldName := stringutil.FirstLowerCase(classType.Field(i).Tag.Get("bson"))
 			fieldValue := pValue.Field(i).Interface()
 			isZero := reflect.ValueOf(fieldValue).IsZero()
-			if arrayutil.Contains(ignoreColumn, fieldName) || (omitempty && isZero) {
+			if arrayutil.Contains(ignoreColumn, fieldName) || (omitempty && fieldValue == nil) || (omitempty && isZero) {
 				continue
 			}
 			document = append(document, bson.E{Key: fieldName, Value: fieldValue})
