@@ -39,7 +39,7 @@ func ParseOtherMail(title, from, to, receiveTime, bodyText string) (*entity.Game
 }
 
 func baseParseMail(handler IMailParser, title, from, to, receiveTime, bodyText string) (*entity.Game, *entity.GameMail) {
-	if /*!handler.checkFrom(from) || */ !handler.checkTitle(title) || !handler.checkKeyword(bodyText) {
+	if !handler.checkFrom(from) || !handler.checkTitle(title) || !handler.checkKeyword(bodyText) {
 		return nil, nil
 	}
 
