@@ -13,6 +13,7 @@ import (
 	"io"
 	"io/ioutil"
 	"mime"
+	"reflect"
 	"regexp"
 	"runtime/debug"
 	"shandianyu-minisdk-mailer/entity"
@@ -36,7 +37,7 @@ func init() {
 
 	for {
 		run()
-		time.Sleep(systemutil.If(isProd, 10*time.Second, time.Second).(time.Duration))
+		time.Sleep(systemutil.If(isProd, 5*time.Second, time.Second).(time.Duration))
 	}
 }
 
@@ -142,7 +143,27 @@ func extractPlainTextFromEntity(entity *message.Entity) (string, error) {
 
 // 根据 charset 解码正文
 func readBodyWithCharset(r io.Reader, charset string) (string, error) {
-	return removeHTMLAndCSS(decodeBodyWithFallback(r)), nil
+	body := removeHTMLAndCSS(decodeBodyWithFallback(r))
+
+	// 第一步：清除不可见字符（零宽、BOM、braille 等）
+	invisibleRunes := []rune{
+		'\u200B', // Zero-width space
+		'\u200C', '\u200D', '\u200E', '\u200F',
+		'\u2028', '\u2029',
+		'\u202F', '\u205F', '\u3000',
+		'\u2800', // braille pattern blank
+		'\uFEFF', // BOM
+		'\u00A0', // Non-breaking space
+		'\u2000', '\u2001', '\u2002', '\u2003',
+		'\u2004', '\u2005', '\u2006', '\u2007',
+		'\u2008', '\u2009', '\u200A',
+	}
+	for _, ch := range invisibleRunes {
+		body = strings.ReplaceAll(body, string(ch), "")
+	}
+	body = strings.ReplaceAll(body, "<br>", "\n")
+	body = regexp.MustCompile(`(\s*\n\s*){3,}`).ReplaceAllString(body, "\n\n")
+	return strings.TrimSpace(body), nil
 }
 
 func removeHTMLAndCSS(input string) string {
@@ -362,13 +383,20 @@ func run() {
 		return gameMails[i].ReceiveTime < gameMails[j].ReceiveTime
 	})
 	for _, newGameMail := range gameMails {
-		// 邮件写入数据库
-		gameDb.InsertOne(*newGameMail)
-
 		// 发送消息
 		title := fmt.Sprintf("游戏 %s 的邮件消息", newGameMail.Symbol)
 		if len(newGameMail.Symbol) <= 0 {
-			title = "未知的邮件类型消息"
+			gameList := service.GameService.GetByDeveloperEmail(newGameMail.Developer)
+			if len(gameList) > 0 {
+				newGameMail.Symbol = strings.Join(arrayutil.Map(gameList, func(game *entity.Game) string {
+					return game.Symbol
+				}), "、")
+				game := service.GameService.GetBySymbol(arrayutil.First(strings.Split(newGameMail.Symbol, "、")))
+				newGameMail.AppVersion = fmt.Sprintf("%v", systemutil.If(reflect.DeepEqual("0.0.0", game.PublishVersion), service.GameService.GetAuditVersion(game), game.PublishVersion))
+				title = fmt.Sprintf("游戏 %s 的邮件消息", newGameMail.Symbol)
+			} else {
+				title = "未知的邮件类型消息"
+			}
 		}
 		data := map[string]string{
 			"status":     newGameMail.Status,
@@ -390,6 +418,9 @@ func run() {
 		} else {
 			feishu.AdminRobot().SendRobotInteractive(title, content)
 		}
+
+		// 邮件写入数据库
+		gameDb.InsertOne(*newGameMail)
 
 		// 记录读取游标
 		service.SystemService.SaveLastMailIndex(newGameMail.ReceiveTime)

@@ -3,6 +3,7 @@ package mail_parser
 import (
 	"shandianyu-minisdk-mailer/entity"
 	"shandianyu-minisdk-mailer/service"
+	"shandianyu-minisdk-mailer/util/arrayutil"
 	"strings"
 )
 
@@ -26,7 +27,7 @@ func (o *submitTraderContactInformationMailParser) checkKeyword(bodyText string)
 }
 
 func (o *submitTraderContactInformationMailParser) parse(bodyText string) (*entity.Game, *entity.GameMail) {
-	oneGame := service.GameService.GetByDeveloperEmail(extractDeveloperEmail(bodyText))
+	oneGame := arrayutil.Last(service.GameService.GetByDeveloperEmail(extractDeveloperEmail(bodyText)))
 	if oneGame == nil {
 		return nil, nil
 	}

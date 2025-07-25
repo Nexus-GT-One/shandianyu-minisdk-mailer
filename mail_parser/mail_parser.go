@@ -5,6 +5,7 @@ import (
 	"runtime/debug"
 	"shandianyu-minisdk-mailer/entity"
 	"shandianyu-minisdk-mailer/service"
+	"shandianyu-minisdk-mailer/util/arrayutil"
 	"shandianyu-minisdk-mailer/util/secretutil"
 	"strings"
 	"time"
@@ -45,7 +46,7 @@ func baseParseMail(handler IMailParser, title, from, to, receiveTime, bodyText s
 
 	oneGame, gameMail := handler.parse(bodyText)
 	if oneGame == nil {
-		oneGame = service.GameService.GetByDeveloperEmail(to)
+		oneGame = arrayutil.Last(service.GameService.GetByDeveloperEmail(to))
 	}
 	gameMail.Title = title
 	gameMail.MD5 = secretutil.MD5(bodyText)

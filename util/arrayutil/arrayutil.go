@@ -61,3 +61,12 @@ func StripEmpty(arr []string) []string {
 	}
 	return result
 }
+
+// 提取原数组某些值组成新数组
+func Map[T comparable, R comparable](arr []T, mapper func(T) R) []R {
+	result := make([]R, len(arr))
+	for i, v := range arr {
+		result[i] = mapper(v)
+	}
+	return result
+}

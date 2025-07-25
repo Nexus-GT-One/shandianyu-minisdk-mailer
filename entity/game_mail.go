@@ -13,7 +13,7 @@ type GameMail struct {
 	Title       string             `bson:"title"`
 	Status      string             `bson:"status"`
 	Content     string             `bson:"content"`
-	MD5         string             `bson:"md5" index:"{'name':'md5','keys':{'md5':-1},'unique':true}"`
+	MD5         string             `bson:"md5" index:"{'name':'md5','keys':{'developer':-1,'md5':-1},'unique':true}"`
 	ReceiveTime int64              `bson:"receiveTime"`
 }
 

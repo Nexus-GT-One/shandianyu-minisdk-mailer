@@ -4,6 +4,7 @@ import (
 	"regexp"
 	"shandianyu-minisdk-mailer/entity"
 	"shandianyu-minisdk-mailer/service"
+	"shandianyu-minisdk-mailer/util/arrayutil"
 	"strings"
 )
 
@@ -25,7 +26,7 @@ func (o *OtherAppstoreMailParser) checkKeyword(bodyText string) bool {
 func (o *OtherAppstoreMailParser) parse(bodyText string) (*entity.Game, *entity.GameMail) {
 	oneGame := service.GameService.GetByName(o.extractAppName(bodyText))
 	if oneGame == nil {
-		oneGame = service.GameService.GetByDeveloperEmail(extractDeveloperEmail(bodyText))
+		oneGame = arrayutil.Last(service.GameService.GetByDeveloperEmail(extractDeveloperEmail(bodyText)))
 		if oneGame == nil {
 			oneGame = &entity.Game{}
 		}
