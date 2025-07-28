@@ -193,11 +193,7 @@ func run() {
 			title := "邮件解析错误"
 			content := fmt.Sprintf("%v\n%v\n", err, string(debug.Stack()))
 			logger.Error(fmt.Sprintf("%v\n%v", title, content))
-			if isProd {
-				feishu.MailRobot().SendRobotInteractive(title, content)
-			} else {
-				feishu.AdminRobot().SendRobotInteractive(title, content)
-			}
+			feishu.AdminRobot().SendRobotInteractive(title, content)
 		}
 	}()
 

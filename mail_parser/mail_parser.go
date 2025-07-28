@@ -45,6 +45,9 @@ func baseParseMail(handler IMailParser, title, from, to, receiveTime, bodyText s
 	}
 
 	oneGame, gameMail := handler.parse(bodyText)
+	if gameMail == nil {
+		return nil, nil
+	}
 	if oneGame == nil {
 		oneGame = arrayutil.Last(service.GameService.GetByDeveloperEmail(to))
 	}
