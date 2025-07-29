@@ -30,7 +30,7 @@ func (a *gameService) GetBySymbol(symbol string) *entity.Game {
 }
 
 func (a *gameService) GetByDeveloperEmail(developerEmail string) []*entity.Game {
-	query := bson.D{{"developerEmail", developerEmail}}
+	query := bson.D{{"channel", "iOS"}, {"developerEmail", developerEmail}}
 	ctx, cursor := db.Find(query, entity.Game{}, &options.FindOptions{Sort: bson.D{{"_id", -1}}})
 	return mongodb.DecodeList(ctx, cursor, entity.Game{})
 }
