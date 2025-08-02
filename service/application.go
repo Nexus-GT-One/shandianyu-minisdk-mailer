@@ -69,7 +69,7 @@ func (a *applicationService) CheckApplicationNewVersion(game *entity.Game, gameM
 包名：%s
 商店：%s
 版本：%s
-备注：%s`, game.Name, game.Symbol, game.BundleId, storeMap[game.Channel], game.PublishVersion,
+备注：邮件确认过审，%s`, game.Name, game.Symbol, game.BundleId, storeMap[game.Channel], game.PublishVersion,
 			fmt.Sprintf("将继续保持审核模式，预计在北京时间 %s 之后关闭审核模式", time.UnixMilli(publishTime).Format(time.DateTime)))
 		game = GameService.UpdateGame(game.Id.Hex(), bson.D{{"publishVersion", publishVersion}, {"publishTime", publishTime}})
 		feishu.DemandRobot().SendRobotMessage(producterMessage, game.Producter...)
@@ -148,7 +148,7 @@ func checkPublishedOrNot(game *entity.Game) {
 版本：%s
 地址：%s
 官网：%s
-备注：%s`, game.Name, game.Symbol, game.BundleId, storeMap[game.Channel], game.PublishVersion, appStoreGeneratorMap[game.Channel](game), websiteUrl, producterMessage)
+备注：邮件确认过审，%s`, game.Name, game.Symbol, game.BundleId, storeMap[game.Channel], game.PublishVersion, appStoreGeneratorMap[game.Channel](game), websiteUrl, producterMessage)
 		feishu.DemandRobot().SendRobotMessage(producterMessage, game.Producter...)
 		feishu.AdminRobot().SendRobotMessage(producterMessage)
 		return
@@ -170,7 +170,7 @@ func checkPublishedOrNot(game *entity.Game) {
 	checkResult := map[bool]string{true: "已经能", false: "不能"}
 	developerMessage := "请注意查看下正式服，请检查热更配置否正常无误"
 	testerMessage := fmt.Sprintf("前置机测试%s进入B面，请再手动检查一遍%s的最新包是否能进入B面", checkResult[flag], storeMap[game.Channel])
-	remark := fmt.Sprintf(`
+	remark := fmt.Sprintf(`邮件确认过审
 产品端：{{.producter}}
 %s
 
