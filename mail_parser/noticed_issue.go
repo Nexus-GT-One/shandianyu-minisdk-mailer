@@ -33,7 +33,7 @@ func (o *noticedIssueMailParser) parse(bodyText string) (*entity.Game, *entity.G
 	}
 	return oneGame, &entity.GameMail{
 		Symbol:     oneGame.Symbol,
-		AppVersion: findAuditingVersion(oneGame),
+		AppVersion: service.GameService.GetAuditingVersion(oneGame),
 		Status:     "被拒",
 		Content:    bodyText,
 	}
@@ -46,4 +46,8 @@ func (o *noticedIssueMailParser) extractAppName(body string) string {
 		return strings.TrimSpace(matches[1])
 	}
 	return ""
+}
+
+func (o *noticedIssueMailParser) after(game *entity.Game, gameMail *entity.GameMail) {
+	service.GameService.RecordRejected(game.BundleId, service.GameService.GetAuditingVersion(game))
 }

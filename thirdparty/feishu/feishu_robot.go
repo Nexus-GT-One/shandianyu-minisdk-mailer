@@ -112,7 +112,7 @@ func (f *FeishuRobot) SendRobotMessage(message string, at ...string) {
 	defer lock.L.Unlock()
 	msg := queueMessage{url: f.url, message: message}
 	if len(at) > 0 {
-		msg.userOpenId = getUserOpenId(strings.TrimSpace(at[0])).OpenId
+		msg.userOpenId = GetUserOpenId(strings.TrimSpace(at[0])).OpenId
 	}
 	queue.Add(msg)
 	lock.Signal()
@@ -158,7 +158,7 @@ func (f *FeishuRobot) SendRobotInteractive(title, content string) {
 }
 
 // https://open.feishu.cn/document/server-docs/contact-v3/user/batch_get_id?appId=cli_a72420c4753fd00e
-func getUserOpenId(email string) UserItem {
+func GetUserOpenId(email string) UserItem {
 	url := "https://open.feishu.cn/open-apis/contact/v3/users/batch_get_id"
 	headers := map[string]string{"Authorization": fmt.Sprintf("Bearer %s", getSdyAppToken())}
 	body, _ := json.Marshal(map[string]any{"mobiles": []string{getAllEmployees()[email].Mobile}})

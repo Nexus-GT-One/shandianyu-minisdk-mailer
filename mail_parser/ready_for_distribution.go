@@ -33,7 +33,7 @@ func (o *readyForDistributionMailParser) parse(bodyText string) (*entity.Game, *
 	}
 	return oneGame, &entity.GameMail{
 		Symbol:     oneGame.Symbol,
-		AppVersion: findAuditingVersion(oneGame),
+		AppVersion: service.GameService.GetAuditingVersion(oneGame),
 		Status:     "过审",
 		Content:    bodyText,
 	}
@@ -46,4 +46,8 @@ func (o *readyForDistributionMailParser) extractAppName(body string) string {
 		return strings.TrimSpace(match[1])
 	}
 	return ""
+}
+
+func (o *readyForDistributionMailParser) after(game *entity.Game, gameMail *entity.GameMail) {
+	service.ApplicationService.CheckApplicationNewVersion(game, gameMail)
 }

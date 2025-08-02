@@ -33,7 +33,7 @@ func (o *readyForReviewMailParser) parse(bodyText string) (*entity.Game, *entity
 	}
 	return oneGame, &entity.GameMail{
 		Symbol:     oneGame.Symbol,
-		AppVersion: findAuditingVersion(oneGame),
+		AppVersion: service.GameService.GetAuditingVersion(oneGame),
 		Status:     "准备审核",
 		Content:    bodyText,
 	}
@@ -47,3 +47,5 @@ func (o *readyForReviewMailParser) extractAppName(body string) string {
 	}
 	return ""
 }
+
+func (o *readyForReviewMailParser) after(game *entity.Game, gameMail *entity.GameMail) {}

@@ -33,7 +33,7 @@ func (o *wasRejectedMailParser) parse(bodyText string) (*entity.Game, *entity.Ga
 	}
 	return oneGame, &entity.GameMail{
 		Symbol:     oneGame.Symbol,
-		AppVersion: findAuditingVersion(oneGame),
+		AppVersion: service.GameService.GetAuditingVersion(oneGame),
 		Status:     "机审4.3被拒",
 		Content:    bodyText,
 	}
@@ -46,4 +46,8 @@ func (o *wasRejectedMailParser) extractAppName(body string) string {
 		return strings.TrimSpace(strings.ReplaceAll(matches[1], "iOS", ""))
 	}
 	return ""
+}
+
+func (o *wasRejectedMailParser) after(game *entity.Game, gameMail *entity.GameMail) {
+	service.GameService.RecordRejected(game.BundleId, service.GameService.GetAuditingVersion(game))
 }

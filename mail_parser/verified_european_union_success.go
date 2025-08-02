@@ -30,3 +30,5 @@ func (o *verifiedEuropeanUnionSuccessMailParser) parse(bodyText string) (*entity
 		Content: bodyText,
 	}
 }
+
+func (o *verifiedEuropeanUnionSuccessMailParser) after(*entity.Game, *entity.GameMail) {}

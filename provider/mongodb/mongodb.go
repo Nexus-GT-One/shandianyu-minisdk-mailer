@@ -211,7 +211,7 @@ func (m *mongodb) InsertMany(entity ...any) []primitive.ObjectID {
 		pValue := reflect.ValueOf(item)
 		for i := 0; i < classType.NumField(); i++ {
 			omitempty := strings.Contains(classType.Field(i).Tag.Get("bson"), "omitempty")
-			fieldName := stringutil.FirstLowerCase(classType.Field(i).Tag.Get("bson"))
+			fieldName := strings.ReplaceAll(stringutil.FirstLowerCase(classType.Field(i).Tag.Get("bson")), ",omitempty", "")
 			fieldValue := pValue.Field(i).Interface()
 			isZero := reflect.ValueOf(fieldValue).IsZero()
 			if arrayutil.Contains(ignoreColumn, fieldName) || (omitempty && fieldValue == nil) || (omitempty && isZero) {

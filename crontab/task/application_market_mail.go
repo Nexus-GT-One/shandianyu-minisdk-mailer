@@ -388,7 +388,7 @@ func run() {
 					return game.Symbol
 				}), "、")
 				game := service.GameService.GetBySymbol(arrayutil.First(strings.Split(newGameMail.Symbol, "、")))
-				newGameMail.AppVersion = fmt.Sprintf("%v", systemutil.If(reflect.DeepEqual("0.0.0", game.PublishVersion), service.GameService.GetAuditVersion(game), game.PublishVersion))
+				newGameMail.AppVersion = fmt.Sprintf("%v", systemutil.If(reflect.DeepEqual("0.0.0", game.PublishVersion), service.GameService.GetAuditingVersion(game), game.PublishVersion))
 				title = fmt.Sprintf("游戏 %s 的邮件消息", newGameMail.Symbol)
 			} else {
 				title = "未知的邮件类型消息"

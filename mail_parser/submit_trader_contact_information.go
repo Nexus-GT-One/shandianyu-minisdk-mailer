@@ -33,8 +33,11 @@ func (o *submitTraderContactInformationMailParser) parse(bodyText string) (*enti
 	}
 	return oneGame, &entity.GameMail{
 		Symbol:     oneGame.Symbol,
-		AppVersion: findAuditingVersion(oneGame),
+		AppVersion: service.GameService.GetAuditingVersion(oneGame),
 		Status:     "已提交欧盟认证",
 		Content:    bodyText,
 	}
+}
+
+func (o *submitTraderContactInformationMailParser) after(game *entity.Game, gameMail *entity.GameMail) {
 }

@@ -56,3 +56,5 @@ func (o *OtherAppstoreMailParser) findAuditingVersion(body string) string {
 	}
 	return ""
 }
+
+func (o *OtherAppstoreMailParser) after(game *entity.Game, gameMail *entity.GameMail) {}

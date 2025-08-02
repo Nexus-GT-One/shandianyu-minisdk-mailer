@@ -21,6 +21,7 @@ type IMailParser interface {
 	checkTitle(title string) bool
 	checkKeyword(bodyText string) bool
 	parse(bodyText string) (*entity.Game, *entity.GameMail)
+	after(*entity.Game, *entity.GameMail)
 }
 
 func ParseMail(title, from, to, receiveTime, bodyText string) (*entity.Game, *entity.GameMail) {
@@ -56,7 +57,12 @@ func baseParseMail(handler IMailParser, title, from, to, receiveTime, bodyText s
 	beijingLocation, _ := time.LoadLocation("Asia/Shanghai")
 	createTime, _ := time.ParseInLocation(time.DateTime, receiveTime, beijingLocation)
 	gameMail.ReceiveTime = createTime.UnixMilli()
-	gameMail.Content = strings.TrimSpace(strings.ReplaceAll(gameMail.Content, "\n", "<br>")) // 换行符换成<br>方便在后台显示
+
+	// 换行符换成<br>方便在后台显示
+	gameMail.Content = strings.TrimSpace(strings.ReplaceAll(gameMail.Content, "\n", "<br>"))
+
+	// 执行邮件解析完成之后要执行的逻辑
+	handler.after(oneGame, gameMail)
 	return oneGame, gameMail
 }
 
@@ -70,17 +76,6 @@ func getName() string {
 	programPath = strings.TrimSpace(strings.Split(programPath, " ")[0])
 	programPath = strings.TrimSpace(programPath[strings.LastIndex(programPath, "/")+1 : strings.LastIndex(programPath, ":")])
 	return programPath[:len(programPath)-3]
-}
-
-func findAuditingVersion(oneGame *entity.Game) string {
-	for appVersion, isAudit := range oneGame.Audit {
-		if !isAudit {
-			continue
-		}
-		return appVersion
-	}
-
-	return ""
 }
 
 func extractDeveloperEmail(body string) string {

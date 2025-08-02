@@ -33,7 +33,7 @@ func (o *OneOrMoreIssuesMailParser) parse(bodyText string) (*entity.Game, *entit
 	}
 	return oneGame, &entity.GameMail{
 		Symbol:     oneGame.Symbol,
-		AppVersion: findAuditingVersion(oneGame),
+		AppVersion: service.GameService.GetAuditingVersion(oneGame),
 		Status:     "有问题待纠正",
 		Content:    bodyText,
 	}
@@ -47,3 +47,5 @@ func (o *OneOrMoreIssuesMailParser) extractAppName(body string) string {
 	}
 	return ""
 }
+
+func (o *OneOrMoreIssuesMailParser) after(game *entity.Game, gameMail *entity.GameMail) {}

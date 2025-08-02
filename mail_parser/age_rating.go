@@ -30,3 +30,5 @@ func (o *AgeRatingMailParser) parse(bodyText string) (*entity.Game, *entity.Game
 		Content: bodyText,
 	}
 }
+
+func (o *AgeRatingMailParser) after(game *entity.Game, gameMail *entity.GameMail) {}
