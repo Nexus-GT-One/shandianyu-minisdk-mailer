@@ -7,7 +7,7 @@ import (
 
 type GameMail struct {
 	Id          primitive.ObjectID `bson:"_id"`
-	Symbol      string             `bson:"symbol" index:"{'name':'symbol','keys':{'symbol':-1}}"`
+	Symbol      string             `bson:"symbol" index:"{'name':'symbol','keys':{'symbol':-1,'appVersion':-1}}"`
 	AppVersion  string             `bson:"appVersion"`
 	Developer   string             `bson:"developer"`
 	Title       string             `bson:"title"`
