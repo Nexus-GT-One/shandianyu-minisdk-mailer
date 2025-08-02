@@ -34,6 +34,7 @@ func (o *appInReviewMailParser) parse(bodyText string) (*entity.Game, *entity.Ga
 	return oneGame, &entity.GameMail{
 		Symbol:     oneGame.Symbol,
 		AppVersion: service.GameService.GetAuditingVersion(oneGame),
+		BuildNum:   service.GameService.GetLastSubmitBuildNum(oneGame),
 		Status:     "正在审核",
 		Content:    bodyText,
 	}

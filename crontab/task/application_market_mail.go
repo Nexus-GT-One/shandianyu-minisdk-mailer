@@ -368,9 +368,6 @@ func run() {
 				continue
 			}
 
-			// 获取当前提审的build号
-			newGameMail.BuildNum = service.GameService.GetLastSubmitBuildNum(oneGame)
-
 			// 加上开发者账号
 			newGameMail.Developer = to
 			gameMails = append(gameMails, newGameMail)

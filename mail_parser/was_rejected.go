@@ -34,6 +34,7 @@ func (o *wasRejectedMailParser) parse(bodyText string) (*entity.Game, *entity.Ga
 	return oneGame, &entity.GameMail{
 		Symbol:     oneGame.Symbol,
 		AppVersion: service.GameService.GetAuditingVersion(oneGame),
+		BuildNum:   service.GameService.GetLastSubmitBuildNum(oneGame),
 		Status:     "机审4.3被拒",
 		Content:    bodyText,
 	}

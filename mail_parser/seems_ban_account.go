@@ -33,7 +33,7 @@ func (o *seemsBanAccountMailParser) parse(bodyText string) (*entity.Game, *entit
 	}
 	return oneGame, &entity.GameMail{
 		Symbol:     oneGame.Symbol,
-		AppVersion: service.GameService.GetAuditingVersion(oneGame),
+		AppVersion: oneGame.PublishVersion,
 		Status:     "疑似封号",
 		Content:    bodyText,
 	}

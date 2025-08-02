@@ -34,6 +34,7 @@ func (o *OneOrMoreIssuesMailParser) parse(bodyText string) (*entity.Game, *entit
 	return oneGame, &entity.GameMail{
 		Symbol:     oneGame.Symbol,
 		AppVersion: service.GameService.GetAuditingVersion(oneGame),
+		BuildNum:   service.GameService.GetLastSubmitBuildNum(oneGame),
 		Status:     "有问题待纠正",
 		Content:    bodyText,
 	}

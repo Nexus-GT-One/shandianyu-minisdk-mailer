@@ -9,7 +9,7 @@ type GameMail struct {
 	Id          primitive.ObjectID `bson:"_id"`
 	Symbol      string             `bson:"symbol" index:"{'name':'symbol','keys':{'symbol':-1,'appVersion':-1,'buildNum':-1}}"`
 	AppVersion  string             `bson:"appVersion"`
-	BuildNum    int                `bson:"buildNum"`
+	BuildNum    int                `bson:"buildNum,omitempty"`
 	Developer   string             `bson:"developer"`
 	Title       string             `bson:"title"`
 	Status      string             `bson:"status"`
