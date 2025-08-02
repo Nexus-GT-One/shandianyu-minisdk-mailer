@@ -15,7 +15,7 @@ type GameMail struct {
 	Status      string             `bson:"status"`
 	Content     string             `bson:"content"`
 	MD5         string             `bson:"md5" index:"{'name':'md5','keys':{'developer':-1,'md5':-1},'unique':true}"`
-	ReceiveTime int64              `bson:"receiveTime"`
+	ReceiveTime int64              `bson:"receiveTime" index:"{'name':'receiveTime','keys':{'receiveTime':-1}}"`
 }
 
 func init() {
