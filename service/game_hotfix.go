@@ -34,6 +34,6 @@ func (a *gameHotfixService) AddVersion(gameId, version, appVersion string) {
 // 开启热更版本
 func (a *gameHotfixService) EnableVersion(gameId, version string) {
 	db.UpdateMany(entity.GameHotfix{}, bson.D{{"gameId", gameId}, {"version", version}}, bson.D{{"enable", true}})
-	GameService.RecordGameOperateHistory(gameId, "crawler", "gameConfig", fmt.Sprintf("把热更版本 %s 的热更状态修改为 开启", version))
+	GameService.RecordGameOperateHistory(gameId, "mailer", "gameConfig", fmt.Sprintf("把热更版本 %s 的热更状态修改为 开启", version))
 	GameService.UpdateGame(gameId, bson.D{})
 }

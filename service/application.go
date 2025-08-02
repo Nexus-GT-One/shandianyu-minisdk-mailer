@@ -112,15 +112,15 @@ func checkPublishedOrNot(game *entity.Game) {
 
 	// 把数据监控开关从 关闭 修改为 开启
 	if !isFirstPackage && !game.MonitorEnable && reflect.DeepEqual("iOS", game.Channel) {
-		GameService.RecordGameOperateHistory(game.Id.Hex(), "crawler", "gameConfig", "把数据监控开关从 关闭 修改为 开启")
+		GameService.RecordGameOperateHistory(game.Id.Hex(), "mailer", "gameConfig", "把数据监控开关从 关闭 修改为 开启")
 	}
 
 	if isFirstPackage {
-		GameService.RecordGameOperateHistory(game.Id.Hex(), "crawler", "gameConfig", fmt.Sprintf("把版本 v_%s 的审核状态修改为 关闭", game.PublishVersion))
+		GameService.RecordGameOperateHistory(game.Id.Hex(), "mailer", "gameConfig", fmt.Sprintf("把版本 v_%s 的审核状态修改为 关闭", game.PublishVersion))
 	} else {
 		if hotfix != nil {
 			GameHotfixService.AddVersion(hotfix.GameId, hotfix.Version, game.PublishVersion)
-			GameService.RecordGameOperateHistory(game.Id.Hex(), "crawler", "gameConfig", fmt.Sprintf("热更版本 %s 已经关联app版本 %s", hotfix.Version, game.PublishVersion))
+			GameService.RecordGameOperateHistory(game.Id.Hex(), "mailer", "gameConfig", fmt.Sprintf("热更版本 %s 已经关联app版本 %s", hotfix.Version, game.PublishVersion))
 			GameHotfixService.EnableVersion(hotfix.GameId, hotfix.Version)
 		}
 	}

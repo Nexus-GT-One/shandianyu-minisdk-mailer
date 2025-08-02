@@ -90,6 +90,21 @@ func (p *gameService) GetLastSubmitVersion(game *entity.Game) string {
 	return auditTrack.AppVersion
 }
 
+func (p *gameService) GetLastSubmitBuildNum(game *entity.Game) int {
+	query := bson.D{
+		{"bundleId", game.BundleId},
+		{"actionType", "_submit_"},
+		{"buildNum", bson.D{{"$exists", true}}},
+	}
+	ctx, cursor := mongodb.GetLoggingInstance().Find(query, entity.AuditTrack{}, &options.FindOptions{Sort: bson.D{{"_id", -1}}})
+	auditTrack := mongodb.DecodeOne(ctx, cursor, entity.AuditTrack{})
+	if auditTrack == nil {
+		return 0
+	}
+
+	return auditTrack.BuildNum
+}
+
 // 记录过审
 func (p *gameService) RecordApproved(bundleId, appVersion string) {
 	systemutil.Goroutine(func() {
