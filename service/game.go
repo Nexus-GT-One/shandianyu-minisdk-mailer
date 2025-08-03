@@ -162,10 +162,10 @@ func (p *gameService) RecordRejected(bundleId, appVersion string) {
 
 		mongodb.GetLoggingInstance().InsertOne(entity.AuditTrack{
 			BundleId:   bundleId,
-			ActionType: "_rejected_",
+			ActionType: "_reject_",
 			AppVersion: appVersion,
 			BuildNum:   rejectedTrack.BuildNum,
-			Remark:     "邮件确认审核不通过",
+			Remark:     "邮件确认被拒",
 			CreateTime: time.Now().UnixMilli(),
 		})
 	})
