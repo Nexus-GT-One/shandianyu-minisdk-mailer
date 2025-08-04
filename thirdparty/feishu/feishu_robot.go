@@ -62,10 +62,10 @@ func init() {
 			obj := dequeue()
 			data := map[string]any{
 				"msg_type": "text",
-				"content":  map[string]string{"text": fmt.Sprintf("【监控消息】%s", obj.message)},
+				"content":  map[string]string{"text": obj.message},
 			}
 			if len(obj.userOpenId) > 0 {
-				data["content"] = map[string]string{"text": fmt.Sprintf(`【监控消息】%s <at user_id="%s"></at>`, obj.message, obj.userOpenId)}
+				data["content"] = map[string]string{"text": fmt.Sprintf(`%s <at user_id="%s"></at>`, obj.message, obj.userOpenId)}
 			}
 			body, _ := json.Marshal(data)
 			response := make(map[string]any)
