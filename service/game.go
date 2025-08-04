@@ -129,7 +129,7 @@ func (p *gameService) RecordApproved(bundleId, appVersion string) {
 		}
 		ctx, cursor = mongodb.GetLoggingInstance().Find(query, entity.AuditTrack{}, &options.FindOptions{Sort: bson.D{{"_id", -1}}})
 		approvedTrack := mongodb.DecodeOne(ctx, cursor, entity.AuditTrack{})
-		if approvedTrack == nil {
+		if approvedTrack != nil {
 			// 已标记的返回
 			return
 		}
