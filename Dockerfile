@@ -1,4 +1,4 @@
-FROM alpine:3.22
+FROM alpine:3.22.1
 WORKDIR /srv/app
 RUN apk update && apk upgrade --available && apk add --no-cache -U tzdata busybox-extras && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo "Asia/Shanghai" > /etc/timezone
 COPY ./config.yaml ./config.yaml
