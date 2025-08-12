@@ -405,6 +405,7 @@ func run() {
 		content := stringutil.TemplateParse(`**游戏状态**：{{.status}}
 **游戏版本**：{{.appVersion}}
 **收件时间**：{{.time}}
+**邮箱地址**：{{.developer}}
 **邮件标题**：{{.title}}
 **邮件内容**：
 {{.content}}`, data)
