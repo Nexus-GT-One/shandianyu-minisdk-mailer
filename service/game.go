@@ -148,13 +148,25 @@ func (p *gameService) RecordApproved(bundleId, appVersion string) {
 // 记录审核不通过
 func (p *gameService) RecordRejected(bundleId, appVersion string) {
 	systemutil.Goroutine(func() {
-		// 如果已经生成过，就不再生成了
+		// 查出build号
 		query := bson.D{
+			{"bundleId", bundleId},
+			{"appVersion", appVersion},
+			{"actionType", "_submit_"},
+		}
+		ctx, cursor := mongodb.GetLoggingInstance().Find(query, entity.AuditTrack{}, &options.FindOptions{Sort: bson.D{{"_id", -1}}})
+		submitTrack := mongodb.DecodeOne(ctx, cursor, entity.AuditTrack{})
+		if submitTrack == nil {
+			return
+		}
+
+		// 如果已经生成过，就不再生成了
+		query = bson.D{
 			{"bundleId", bundleId},
 			{"appVersion", appVersion},
 			{"actionType", "_rejected_"},
 		}
-		ctx, cursor := mongodb.GetLoggingInstance().Find(query, entity.AuditTrack{}, &options.FindOptions{Sort: bson.D{{"_id", -1}}})
+		ctx, cursor = mongodb.GetLoggingInstance().Find(query, entity.AuditTrack{}, &options.FindOptions{Sort: bson.D{{"_id", -1}}})
 		rejectedTrack := mongodb.DecodeOne(ctx, cursor, entity.AuditTrack{})
 		if rejectedTrack != nil {
 			return
@@ -164,7 +176,7 @@ func (p *gameService) RecordRejected(bundleId, appVersion string) {
 			BundleId:   bundleId,
 			ActionType: "_reject_",
 			AppVersion: appVersion,
-			BuildNum:   rejectedTrack.BuildNum,
+			BuildNum:   submitTrack.BuildNum,
 			Remark:     "邮件确认被拒",
 			CreateTime: time.Now().UnixMilli(),
 		})
