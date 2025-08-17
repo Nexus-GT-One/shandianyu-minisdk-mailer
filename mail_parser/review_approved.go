@@ -29,7 +29,10 @@ func (o *reviewApprovedMailParser) checkKeyword(bodyText string) bool {
 func (o *reviewApprovedMailParser) parse(bodyText string) (*entity.Game, *entity.GameMail) {
 	oneGame := service.GameService.GetByName(o.extractAppName(bodyText))
 	if oneGame == nil {
-		return nil, nil
+		oneGame = service.GameService.GetByAppId(o.extractAppId(bodyText))
+		if oneGame == nil {
+			return nil, nil
+		}
 	}
 	return oneGame, &entity.GameMail{
 		Symbol:     oneGame.Symbol,
@@ -45,6 +48,16 @@ func (o *reviewApprovedMailParser) extractAppName(body string) string {
 	match := re.FindStringSubmatch(body)
 	if len(match) > 1 {
 		return strings.TrimSpace(match[1])
+	}
+	return ""
+}
+
+func (o *reviewApprovedMailParser) extractAppId(s string) string {
+	// 忽略大小写，匹配 /id 后的一串数字
+	re := regexp.MustCompile(`(?i)/id(\d+)\b`)
+	m := re.FindStringSubmatch(s)
+	if len(m) >= 2 {
+		return m[1]
 	}
 	return ""
 }

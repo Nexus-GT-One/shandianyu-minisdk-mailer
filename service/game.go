@@ -32,6 +32,11 @@ func (a *gameService) GetBySymbol(symbol string) *entity.Game {
 	return mongodb.DecodeOne(ctx, cursor, entity.Game{})
 }
 
+func (a *gameService) GetByAppId(appId string) *entity.Game {
+	ctx, cursor := db.FindOne(bson.D{{"appId", appId}}, entity.Game{})
+	return mongodb.DecodeOne(ctx, cursor, entity.Game{})
+}
+
 func (a *gameService) GetOneGameById(id string) *entity.Game {
 	objectID, _ := primitive.ObjectIDFromHex(id)
 	ctx, cursor := db.FindOne(bson.D{{"_id", objectID}}, entity.Game{})
