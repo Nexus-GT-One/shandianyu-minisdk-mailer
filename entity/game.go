@@ -68,15 +68,15 @@ type Game struct {
 	Developer                                    []string                              `bson:"developer"`
 	Tester                                       []string                              `bson:"tester"`
 	Producter                                    []string                              `bson:"producter"`
+	LastUtcDayActive                             int                                   `bson:"lastUtcDayActive"`
 	DeveloperEmail                               string                                `bson:"developerEmail"`
-	DeveloperEmailConfirm                        bool                                  `bson:"developerEmailConfirm"`
 	CocosScriptKey                               string                                `bson:"cocosScriptKey"`
 	CocosEncryptKey                              string                                `bson:"cocosEncryptKey"`
 	CocosEncryptCode                             string                                `bson:"cocosEncryptCode"`
-	SourcePin                                    string                                `bson:"sourcePin"`
 	ProductionDomain                             string                                `bson:"productionDomain"`
 	TestingDomain                                string                                `bson:"testingDomain"`
-	IsUseLocalSource                             bool                                  `bson:"isUseLocalSource"`
+	IsDispatched                                 bool                                  `bson:"isDispatched"`
+	DispatchedVersion                            string                                `bson:"dispatchedVersion"`
 	IsLogReportAllCocosHU                        bool                                  `bson:"isLogReportAllCocosHU"`
 	IsLogReportAllCocosNormal                    bool                                  `bson:"isLogReportAllCocosNormal"`
 	IsLogReportAllSDKIAP                         bool                                  `bson:"isLogReportAllSDKIAP"`
@@ -125,6 +125,7 @@ type Game struct {
 	WwyWebhookEnable                             bool                                  `bson:"wwyWebhookEnable"`
 	WwyTestingDevice                             string                                `bson:"wwyTestingDevice,omitempty"`
 	WwyUploadParameters                          map[string]any                        `bson:"wwyUploadParameters"`
+	IsRealtimeWwyLog                             bool                                  `bson:"isRealtimeWwyLog"`
 	AdParametersVer                              int64                                 `bson:"adParametersVer"`
 	AdjustKey                                    string                                `bson:"adjustKey"`
 	ApplovinKey                                  string                                `bson:"applovinKey"`

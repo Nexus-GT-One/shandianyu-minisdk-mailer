@@ -189,11 +189,10 @@ func (p *gameService) RecordRejected(bundleId, appVersion string) {
 }
 
 // 记录游戏可投包版本
-func (p *gameService) RecordGameDispatchedVersion(game *entity.Game, appVersion string) {
+func (p *gameService) RecordGameDispatchedVersion(game *entity.Game, dispatchedVersion string) {
 	if !game.WwyEnable {
 		return
 	}
 
-	query := bson.D{{"symbol", game.Symbol}}
-	db.UpdateMany(entity.GameDispatchedVersion{}, query, bson.D{{"appVersion", appVersion}}, options.Update().SetUpsert(true))
+	p.UpdateGame(game.Id.Hex(), bson.D{{"dispatchedVersion", dispatchedVersion}})
 }
