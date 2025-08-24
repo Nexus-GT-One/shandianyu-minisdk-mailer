@@ -110,6 +110,9 @@ func checkPublishedOrNot(game *entity.Game) {
 	// 审核轨迹标记“已过审”
 	GameService.RecordApproved(game.BundleId, game.PublishVersion)
 
+	// 记录游戏可投包版本
+	GameService.RecordGameDispatchedVersion(game, game.PublishVersion)
+
 	// 把数据监控开关从 关闭 修改为 开启
 	if !isFirstPackage && !game.MonitorEnable && reflect.DeepEqual("iOS", game.Channel) {
 		GameService.RecordGameOperateHistory(game.Id.Hex(), "mailer", "gameConfig", "把数据监控开关从 关闭 修改为 开启")
