@@ -5,6 +5,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"reflect"
 	"shandianyu-minisdk-mailer/entity"
 	"shandianyu-minisdk-mailer/provider/mongodb"
 	"shandianyu-minisdk-mailer/util/arrayutil"
@@ -190,9 +191,8 @@ func (p *gameService) RecordRejected(bundleId, appVersion string) {
 
 // 记录游戏可投包版本
 func (p *gameService) RecordGameDispatchedVersion(game *entity.Game, dispatchedVersion string) {
-	if !game.WwyEnable {
+	if !game.WwyEnable || !reflect.DeepEqual("0.0.0", game.DispatchedVersion) {
 		return
 	}
-
 	p.UpdateGame(game.Id.Hex(), bson.D{{"dispatchedVersion", dispatchedVersion}})
 }
