@@ -12,6 +12,7 @@ import (
 	"golang.org/x/text/transform"
 	"io"
 	"io/ioutil"
+	"log"
 	"mime"
 	"reflect"
 	"regexp"
@@ -344,6 +345,10 @@ func run() {
 			}
 
 			// 打印一下邮件
+			if len(mailInfo.Envelope.To) <= 0 || len(mailInfo.Envelope.From) <= 0 {
+				continue
+			}
+			log.Println(subject, "|", mailInfo.Envelope.To)
 			to := strings.TrimSpace((*arrayutil.First(mailInfo.Envelope.To)).Address())
 			from := strings.TrimSpace((*arrayutil.First(mailInfo.Envelope.From)).PersonalName)
 			logger.Info("序号: %d\n日期: %s\n发件人: %s\n收件人: %s\n主题: %s\nmd5: %s\n正文:\n%s\n\n",
