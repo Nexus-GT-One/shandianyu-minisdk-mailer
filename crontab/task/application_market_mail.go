@@ -16,12 +16,14 @@ import (
 	"reflect"
 	"regexp"
 	"runtime/debug"
+	Channel "shandianyu-minisdk-mailer/constant"
 	"shandianyu-minisdk-mailer/entity"
 	"shandianyu-minisdk-mailer/mail_parser"
 	"shandianyu-minisdk-mailer/service"
 	"shandianyu-minisdk-mailer/thirdparty/aigcbest"
 	"shandianyu-minisdk-mailer/thirdparty/feishu"
 	"shandianyu-minisdk-mailer/util/arrayutil"
+	"shandianyu-minisdk-mailer/util/objectutil"
 	"shandianyu-minisdk-mailer/util/secretutil"
 	"shandianyu-minisdk-mailer/util/stringutil"
 	"shandianyu-minisdk-mailer/util/systemutil"
@@ -420,7 +422,12 @@ func run() {
 {{.translation}}`, data)
 
 		if isProd {
-			feishu.MailRobot().SendRobotInteractive(title, content)
+			oneGame := service.GameService.GetBySymbol(newGameMail.Symbol)
+			if objectutil.IsEnumEquals(Channel.IOS, oneGame.Channel) {
+				feishu.IOSMailRobot().SendRobotInteractive(title, content)
+			} else {
+				feishu.GPMailRobot().SendRobotInteractive(title, content)
+			}
 		} else {
 			feishu.AdminRobot().SendRobotInteractive(title, content)
 		}

@@ -30,8 +30,10 @@ import (
 //https://open.feishu.cn/open-apis/bot/v2/hook/d8020653-9958-432d-ba9b-b72dbe0c7ea4
 //归因率报警群
 //https://open.feishu.cn/open-apis/bot/v2/hook/c7588d71-bcdb-47a1-ac61-06fe307b358a
-//邮件通知群
+//iOS邮件通知群
 //https://open.feishu.cn/open-apis/bot/v2/hook/484a4255-fe36-426e-a789-7c9a0c99d1c5
+//GP邮件通知群
+//https://open.feishu.cn/open-apis/bot/v2/hook/4ae33f52-6e9e-451c-a463-a6084cace9af
 
 type FeishuRobot struct{ url string }
 
@@ -94,8 +96,11 @@ func CheckPointRobot() *FeishuRobot {
 	return &FeishuRobot{url: "https://open.feishu.cn/open-apis/bot/v2/hook/d8020653-9958-432d-ba9b-b72dbe0c7ea4"}
 }
 
-func MailRobot() *FeishuRobot {
+func IOSMailRobot() *FeishuRobot {
 	return &FeishuRobot{url: "https://open.feishu.cn/open-apis/bot/v2/hook/484a4255-fe36-426e-a789-7c9a0c99d1c5"}
+}
+func GPMailRobot() *FeishuRobot {
+	return &FeishuRobot{url: "https://open.feishu.cn/open-apis/bot/v2/hook/4ae33f52-6e9e-451c-a463-a6084cace9af"}
 }
 
 func DevRobot() *FeishuRobot {
