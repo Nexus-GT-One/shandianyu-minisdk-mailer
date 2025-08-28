@@ -335,7 +335,7 @@ func run() {
 
 			// 如果已经读取过的邮件就不需要再读取了
 			if lastMailIndex >= dateInBeijing.UnixMilli() {
-				logger.Info("邮件已经读完了，最新游标：%v", dateInBeijing.Format(time.DateTime))
+				logger.Info("邮件已经读完了，最新游标：%v", time.UnixMilli(lastMailIndex).Format(time.DateTime))
 				break
 			}
 
