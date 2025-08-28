@@ -24,7 +24,7 @@ func (o *verifiedEuropeanUnionSuccessMailParser) checkKeyword(bodyText string) b
 	return strings.Contains(bodyText, "verified your trader contact") && strings.Contains(bodyText, "European Union")
 }
 
-func (o *verifiedEuropeanUnionSuccessMailParser) parse(bodyText string) (*entity.Game, *entity.GameMail) {
+func (o *verifiedEuropeanUnionSuccessMailParser) parse(from, to, bodyText string) (*entity.Game, *entity.GameMail) {
 	return nil, &entity.GameMail{
 		Status:  "欧盟认证成功",
 		Content: bodyText,

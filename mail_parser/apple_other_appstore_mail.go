@@ -23,10 +23,10 @@ func (o *OtherAppstoreMailParser) checkKeyword(bodyText string) bool {
 	return strings.Contains(bodyText, "App Store")
 }
 
-func (o *OtherAppstoreMailParser) parse(bodyText string) (*entity.Game, *entity.GameMail) {
+func (o *OtherAppstoreMailParser) parse(from, to, bodyText string) (*entity.Game, *entity.GameMail) {
 	oneGame := service.GameService.GetByName(o.extractAppName(bodyText))
 	if oneGame == nil {
-		oneGame = arrayutil.Last(service.GameService.GetByDeveloperEmail(extractDeveloperEmail(bodyText)))
+		oneGame = arrayutil.First(service.GameService.GetByDeveloperEmail(extractDeveloperEmail(bodyText)))
 		if oneGame == nil {
 			oneGame = &entity.Game{}
 		}

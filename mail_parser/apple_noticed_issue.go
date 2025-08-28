@@ -26,7 +26,7 @@ func (o *noticedIssueMailParser) checkKeyword(bodyText string) bool {
 	return strings.Contains(bodyText, "noticed an issue")
 }
 
-func (o *noticedIssueMailParser) parse(bodyText string) (*entity.Game, *entity.GameMail) {
+func (o *noticedIssueMailParser) parse(from, to, bodyText string) (*entity.Game, *entity.GameMail) {
 	oneGame := service.GameService.GetByName(o.extractAppName(bodyText))
 	if oneGame == nil {
 		return nil, nil

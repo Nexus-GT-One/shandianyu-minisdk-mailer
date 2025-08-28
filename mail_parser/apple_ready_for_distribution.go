@@ -26,7 +26,7 @@ func (o *readyForDistributionMailParser) checkKeyword(bodyText string) bool {
 	return strings.Contains(bodyText, "ready for distribution")
 }
 
-func (o *readyForDistributionMailParser) parse(bodyText string) (*entity.Game, *entity.GameMail) {
+func (o *readyForDistributionMailParser) parse(from, to, bodyText string) (*entity.Game, *entity.GameMail) {
 	oneGame := service.GameService.GetByName(o.extractAppName(bodyText))
 	if oneGame == nil {
 		return nil, nil

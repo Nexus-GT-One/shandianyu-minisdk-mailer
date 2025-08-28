@@ -26,7 +26,7 @@ func (o *hasCompletedProcessingMailParser) checkKeyword(bodyText string) bool {
 	return strings.Contains(bodyText, "has completed processing")
 }
 
-func (o *hasCompletedProcessingMailParser) parse(bodyText string) (*entity.Game, *entity.GameMail) {
+func (o *hasCompletedProcessingMailParser) parse(from, to, bodyText string) (*entity.Game, *entity.GameMail) {
 	oneGame := service.GameService.GetByName(o.extractAppName(bodyText))
 	if oneGame == nil {
 		return nil, nil

@@ -26,7 +26,7 @@ func (o *waitingForReviewMailParser) checkKeyword(bodyText string) bool {
 	return strings.Contains(bodyText, "Waiting for Review")
 }
 
-func (o *waitingForReviewMailParser) parse(bodyText string) (*entity.Game, *entity.GameMail) {
+func (o *waitingForReviewMailParser) parse(from, to, bodyText string) (*entity.Game, *entity.GameMail) {
 	oneGame := service.GameService.GetByName(o.extractAppName(bodyText))
 	if oneGame == nil {
 		return nil, nil

@@ -26,7 +26,7 @@ func (o *submitAppSuccessMailParser) checkKeyword(bodyText string) bool {
 	return strings.Contains(bodyText, "We've received your app for review")
 }
 
-func (o *submitAppSuccessMailParser) parse(bodyText string) (*entity.Game, *entity.GameMail) {
+func (o *submitAppSuccessMailParser) parse(from, to, bodyText string) (*entity.Game, *entity.GameMail) {
 	oneGame := service.GameService.GetByName(o.extractAppName(bodyText))
 	if oneGame == nil {
 		return nil, nil

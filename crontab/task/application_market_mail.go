@@ -12,7 +12,6 @@ import (
 	"golang.org/x/text/transform"
 	"io"
 	"io/ioutil"
-	"log"
 	"mime"
 	"reflect"
 	"regexp"
@@ -20,6 +19,7 @@ import (
 	"shandianyu-minisdk-mailer/entity"
 	"shandianyu-minisdk-mailer/mail_parser"
 	"shandianyu-minisdk-mailer/service"
+	"shandianyu-minisdk-mailer/thirdparty/aigcbest"
 	"shandianyu-minisdk-mailer/thirdparty/feishu"
 	"shandianyu-minisdk-mailer/util/arrayutil"
 	"shandianyu-minisdk-mailer/util/secretutil"
@@ -270,7 +270,7 @@ func run() {
 		})
 	}
 
-	pageSize := 50
+	pageSize := 100
 	beijingLoc, _ := time.LoadLocation("Asia/Shanghai")
 	total := len(mails)
 	totalPages := total / pageSize
@@ -348,7 +348,6 @@ func run() {
 			if len(mailInfo.Envelope.To) <= 0 || len(mailInfo.Envelope.From) <= 0 {
 				continue
 			}
-			log.Println(subject, "|", mailInfo.Envelope.To)
 			to := strings.TrimSpace((*arrayutil.First(mailInfo.Envelope.To)).Address())
 			from := strings.TrimSpace((*arrayutil.First(mailInfo.Envelope.From)).PersonalName)
 			logger.Info("序号: %d\n日期: %s\n发件人: %s\n收件人: %s\n主题: %s\nmd5: %s\n正文:\n%s\n\n",
@@ -399,13 +398,16 @@ func run() {
 				title = "未知的邮件类型消息"
 			}
 		}
+		translation := aigcbest.ChatCompletion(fmt.Sprintf("%s\n帮我把以上文字翻译成中文，直接返回", newGameMail.Content))
+		translationContent := strings.TrimSpace(arrayutil.First(translation.Choices).Message.Content)
 		data := map[string]string{
-			"status":     newGameMail.Status,
-			"developer":  newGameMail.Developer,
-			"appVersion": newGameMail.AppVersion,
-			"time":       time.UnixMilli(newGameMail.ReceiveTime).Format(time.DateTime),
-			"title":      newGameMail.Title,
-			"content":    newGameMail.Content,
+			"status":      newGameMail.Status,
+			"developer":   newGameMail.Developer,
+			"appVersion":  newGameMail.AppVersion,
+			"time":        time.UnixMilli(newGameMail.ReceiveTime).Format(time.DateTime),
+			"title":       newGameMail.Title,
+			"content":     newGameMail.Content,
+			"translation": translationContent,
 		}
 		content := stringutil.TemplateParse(`**游戏状态**：{{.status}}
 **游戏版本**：{{.appVersion}}
@@ -413,7 +415,9 @@ func run() {
 **邮箱地址**：{{.developer}}
 **邮件标题**：{{.title}}
 **邮件内容**：
-{{.content}}`, data)
+{{.content}}
+**邮件译文**：
+{{.translation}}`, data)
 
 		if isProd {
 			feishu.MailRobot().SendRobotInteractive(title, content)

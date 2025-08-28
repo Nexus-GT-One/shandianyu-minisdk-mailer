@@ -26,7 +26,7 @@ func (o *reviewApprovedMailParser) checkKeyword(bodyText string) bool {
 	return strings.Contains(bodyText, "eligible for distribution")
 }
 
-func (o *reviewApprovedMailParser) parse(bodyText string) (*entity.Game, *entity.GameMail) {
+func (o *reviewApprovedMailParser) parse(from, to, bodyText string) (*entity.Game, *entity.GameMail) {
 	oneGame := service.GameService.GetByName(o.extractAppName(bodyText))
 	if oneGame == nil {
 		oneGame = service.GameService.GetByAppId(o.extractAppId(bodyText))

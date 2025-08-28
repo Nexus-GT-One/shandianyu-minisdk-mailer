@@ -26,8 +26,8 @@ func (o *submitTraderContactInformationMailParser) checkKeyword(bodyText string)
 	return strings.Contains(bodyText, "providing your trader contact information")
 }
 
-func (o *submitTraderContactInformationMailParser) parse(bodyText string) (*entity.Game, *entity.GameMail) {
-	oneGame := arrayutil.Last(service.GameService.GetByDeveloperEmail(extractDeveloperEmail(bodyText)))
+func (o *submitTraderContactInformationMailParser) parse(from, to, bodyText string) (*entity.Game, *entity.GameMail) {
+	oneGame := arrayutil.First(service.GameService.GetByDeveloperEmail(extractDeveloperEmail(bodyText)))
 	if oneGame == nil {
 		return nil, nil
 	}

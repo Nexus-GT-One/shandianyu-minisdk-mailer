@@ -20,7 +20,7 @@ type IMailParser interface {
 	checkFrom(from string) bool
 	checkTitle(title string) bool
 	checkKeyword(bodyText string) bool
-	parse(bodyText string) (*entity.Game, *entity.GameMail)
+	parse(from, to, bodyText string) (*entity.Game, *entity.GameMail)
 	after(*entity.Game, *entity.GameMail)
 }
 
@@ -45,12 +45,12 @@ func baseParseMail(handler IMailParser, title, from, to, receiveTime, bodyText s
 		return nil, nil
 	}
 
-	oneGame, gameMail := handler.parse(bodyText)
+	oneGame, gameMail := handler.parse(from, to, bodyText)
 	if gameMail == nil {
 		return nil, nil
 	}
 	if oneGame == nil {
-		oneGame = arrayutil.Last(service.GameService.GetByDeveloperEmail(to))
+		oneGame = arrayutil.First(service.GameService.GetByDeveloperEmail(to))
 	}
 	gameMail.Title = title
 	gameMail.MD5 = secretutil.MD5(bodyText)
@@ -83,6 +83,16 @@ func extractDeveloperEmail(body string) string {
 	match := re.FindStringSubmatch(body)
 	if len(match) > 1 {
 		return strings.TrimSpace(match[1])
+	}
+
+	return ""
+}
+
+func extractBundleId(body string) string {
+	re := regexp.MustCompile(`\(([a-zA-Z][a-zA-Z0-9_]*(?:\.[a-zA-Z0-9_]+)+)\)`)
+	matches := re.FindStringSubmatch(body)
+	if len(matches) > 1 {
+		return strings.TrimSpace(matches[1])
 	}
 
 	return ""

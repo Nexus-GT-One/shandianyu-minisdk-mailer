@@ -7,26 +7,26 @@ import (
 	"strings"
 )
 
-// 正在审核
-type appInReviewMailParser struct{}
+// 准备审核
+type readyForReviewMailParser struct{}
 
 func init() {
-	registerImplement(&appInReviewMailParser{})
+	registerImplement(&readyForReviewMailParser{})
 }
 
-func (o *appInReviewMailParser) checkFrom(from string) bool {
+func (o *readyForReviewMailParser) checkFrom(from string) bool {
 	return strings.Contains(from, "App Store Connect")
 }
 
-func (o *appInReviewMailParser) checkTitle(title string) bool {
-	return strings.Contains(title, `is now "In Review"`)
+func (o *readyForReviewMailParser) checkTitle(title string) bool {
+	return strings.Contains(title, `is now "Ready For Review"`)
 }
 
-func (o *appInReviewMailParser) checkKeyword(bodyText string) bool {
-	return strings.Contains(bodyText, "In Review")
+func (o *readyForReviewMailParser) checkKeyword(bodyText string) bool {
+	return strings.Contains(bodyText, "Ready For Review")
 }
 
-func (o *appInReviewMailParser) parse(bodyText string) (*entity.Game, *entity.GameMail) {
+func (o *readyForReviewMailParser) parse(from, to, bodyText string) (*entity.Game, *entity.GameMail) {
 	oneGame := service.GameService.GetByName(o.extractAppName(bodyText))
 	if oneGame == nil {
 		return nil, nil
@@ -35,12 +35,12 @@ func (o *appInReviewMailParser) parse(bodyText string) (*entity.Game, *entity.Ga
 		Symbol:     oneGame.Symbol,
 		AppVersion: service.GameService.GetAuditingVersion(oneGame),
 		BuildNum:   service.GameService.GetLastSubmitBuildNum(oneGame),
-		Status:     "正在审核",
+		Status:     "准备审核",
 		Content:    bodyText,
 	}
 }
 
-func (o *appInReviewMailParser) extractAppName(body string) string {
+func (o *readyForReviewMailParser) extractAppName(body string) string {
 	re := regexp.MustCompile(`App Name:\s*(.*?)\s*App Version Number:`)
 	matches := re.FindStringSubmatch(body)
 	if len(matches) > 1 {
@@ -49,4 +49,4 @@ func (o *appInReviewMailParser) extractAppName(body string) string {
 	return ""
 }
 
-func (o *appInReviewMailParser) after(game *entity.Game, gameMail *entity.GameMail) {}
+func (o *readyForReviewMailParser) after(game *entity.Game, gameMail *entity.GameMail) {}

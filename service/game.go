@@ -27,6 +27,12 @@ func (a *gameService) GetByName(name string) *entity.Game {
 	return mongodb.DecodeOne(ctx, cursor, entity.Game{})
 }
 
+func (a *gameService) GetByBundleId(bundleId string) *entity.Game {
+	query := bson.D{{"bundleId", bundleId}}
+	ctx, cursor := db.FindOne(query, entity.Game{})
+	return mongodb.DecodeOne(ctx, cursor, entity.Game{})
+}
+
 func (a *gameService) GetBySymbol(symbol string) *entity.Game {
 	query := bson.D{{"symbol", symbol}}
 	ctx, cursor := db.FindOne(query, entity.Game{})
@@ -50,7 +56,7 @@ func (a *gameService) UpdateGame(gameId string, updates bson.D) *entity.Game {
 }
 
 func (a *gameService) GetByDeveloperEmail(developerEmail string) []*entity.Game {
-	query := bson.D{{"channel", "iOS"}, {"developerEmail", developerEmail}}
+	query := bson.D{{"developerEmail", developerEmail}}
 	ctx, cursor := db.Find(query, entity.Game{}, &options.FindOptions{Sort: bson.D{{"_id", -1}}})
 	return mongodb.DecodeList(ctx, cursor, entity.Game{})
 }
