@@ -72,7 +72,7 @@ type UserInfo struct {
 func ChatCompletion(content string) *ChatCompletionResponse {
 	res := &ChatCompletionResponse{}
 	if reflect.DeepEqual(runtime.GOOS, "windows") {
-		//return res
+		return res
 	}
 
 	headers := map[string]string{"Authorization": "Bearer sk-lwZJ0mBUKGuphTpdF1dj2IwIt9pnkpr5wVI0MRRnUcTan47k"}
