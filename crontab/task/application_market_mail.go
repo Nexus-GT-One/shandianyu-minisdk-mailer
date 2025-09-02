@@ -423,7 +423,7 @@ func run() {
 
 		if isProd {
 			oneGame := service.GameService.GetBySymbol(newGameMail.Symbol)
-			if objectutil.IsEnumEquals(Channel.IOS, oneGame.Channel) {
+			if oneGame == nil || objectutil.IsEnumEquals(Channel.IOS, oneGame.Channel) {
 				feishu.IOSMailRobot().SendRobotInteractive(title, content)
 			} else {
 				feishu.GPMailRobot().SendRobotInteractive(title, content)
