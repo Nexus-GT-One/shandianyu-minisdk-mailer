@@ -423,10 +423,14 @@ func run() {
 
 		if isProd {
 			oneGame := service.GameService.GetBySymbol(newGameMail.Symbol)
-			if oneGame == nil || objectutil.IsEnumEquals(Channel.IOS, oneGame.Channel) {
+			if oneGame != nil {
+				if objectutil.IsEnumEquals(Channel.IOS, oneGame.Channel) {
+					feishu.IOSMailRobot().SendRobotInteractive(title, content)
+				} else {
+					feishu.GPMailRobot().SendRobotInteractive(title, content)
+				}
+			} else if strings.Contains(newGameMail.Title, "Your trader contact information was verified") {
 				feishu.IOSMailRobot().SendRobotInteractive(title, content)
-			} else {
-				feishu.GPMailRobot().SendRobotInteractive(title, content)
 			}
 		} else {
 			feishu.AdminRobot().SendRobotInteractive(title, content)
