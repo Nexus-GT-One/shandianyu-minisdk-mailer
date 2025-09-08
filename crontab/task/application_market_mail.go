@@ -105,6 +105,15 @@ func extractPlainTextFromEntity(entity *message.Entity) (string, error) {
 				return readBodyWithCharset(part.Body, charset)
 			case "text/html":
 				htmlBody, err := readBodyWithCharset(part.Body, charset)
+				boundary := strings.TrimSpace(params["boundary"])
+				if strings.Contains(htmlBody, "Critter Stack Tribe") {
+					if len(boundary) > 0 && strings.Contains(htmlBody, boundary) {
+						htmlBody = strings.TrimSpace(strings.Split(htmlBody, boundary)[2])
+						htmlBody = htmlBody[strings.Index(htmlBody, "Developer update")+16 : strings.Index(htmlBody, "LANG=")]
+						htmlBody = strings.TrimSpace(strings.ReplaceAll(htmlBody, "=\n", ""))
+						return htmlBody, nil
+					}
+				}
 				if err == nil {
 					htmlFallback = htmlBody
 				} else {
@@ -129,7 +138,6 @@ func extractPlainTextFromEntity(entity *message.Entity) (string, error) {
 		contentType = "text/plain"
 	}
 	charset := strings.ToLower(params["charset"])
-
 	switch contentType {
 	case "text/plain":
 		return readBodyWithCharset(entity.Body, charset)
@@ -179,6 +187,12 @@ func removeHTMLAndCSS(input string) string {
 	input = reInlineStyle.ReplaceAllString(input, "")
 
 	// 移除所有 HTML 标签
+	input = strings.ReplaceAll(input, "</h1>", "</h1>\n")
+	input = strings.ReplaceAll(input, "</h2>", "</h2>\n")
+	input = strings.ReplaceAll(input, "</h3>", "</h3>\n")
+	input = strings.ReplaceAll(input, "</h4>", "</h4>\n")
+	input = strings.ReplaceAll(input, "</h5>", "</h5>\n")
+	input = strings.ReplaceAll(input, "</h6>", "</h6>\n")
 	reTags := regexp.MustCompile(`(?is)<[^>]+>`)
 	input = reTags.ReplaceAllString(input, "")
 
@@ -399,6 +413,9 @@ func run() {
 			} else {
 				title = "未知的邮件类型消息"
 			}
+		}
+		if reflect.DeepEqual("hexstack", newGameMail.Symbol) {
+			newGameMail.AppVersion = "1.0.0"
 		}
 		translation := aigcbest.ChatCompletion(fmt.Sprintf("%s\n帮我把以上文字翻译成中文，直接返回", newGameMail.Content))
 		translationContent := strings.TrimSpace(arrayutil.First(translation.Choices).Message.Content)

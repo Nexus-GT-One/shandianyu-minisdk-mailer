@@ -11,6 +11,7 @@ require (
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
 	github.com/oschwald/geoip2-golang v1.11.0
 	github.com/robfig/cron/v3 v3.0.1
+	github.com/shopspring/decimal v1.4.0
 	github.com/spf13/viper v1.18.2
 	github.com/xuri/excelize/v2 v2.9.1
 	go.mongodb.org/mongo-driver v1.15.0
@@ -37,7 +38,6 @@ require (
 	github.com/richardlehane/msoleps v1.0.4 // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
-	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.6.0 // indirect
