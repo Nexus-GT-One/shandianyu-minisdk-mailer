@@ -414,9 +414,6 @@ func run() {
 				title = "未知的邮件类型消息"
 			}
 		}
-		if reflect.DeepEqual("hexstack", newGameMail.Symbol) {
-			newGameMail.AppVersion = "1.0.0"
-		}
 		translation := aigcbest.ChatCompletion(fmt.Sprintf("%s\n帮我把以上文字翻译成中文，直接返回", newGameMail.Content))
 		translationContent := strings.TrimSpace(arrayutil.First(translation.Choices).Message.Content)
 		data := map[string]string{
