@@ -32,7 +32,7 @@ func (o *rejectedMailParser) parse(from, to, bodyText string) (*entity.Game, *en
 	}
 	return oneGame, &entity.GameMail{
 		Symbol:     oneGame.Symbol,
-		AppVersion: oneGame.PublishVersion,
+		AppVersion: service.GameService.GetAuditingVersion(oneGame),
 		Status:     "拒审",
 		Content:    bodyText,
 	}
