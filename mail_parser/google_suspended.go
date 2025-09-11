@@ -26,7 +26,7 @@ func (o *suspendedMailParser) checkKeyword(bodyText string) bool {
 }
 
 func (o *suspendedMailParser) parse(from, to, bodyText string) (*entity.Game, *entity.GameMail) {
-	oneGame := service.GameService.GetByName(extractBundleId(bodyText))
+	oneGame := service.GameService.GetByBundleId(extractBundleId(bodyText))
 	if oneGame == nil {
 		return nil, nil
 	}
