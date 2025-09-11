@@ -15,6 +15,7 @@ import (
 // https://shimo.im/sheets/KlkKvKD25wcLG4qd/MODOC
 
 var mailParserImplementMap = make(map[string]IMailParser)
+var storeMap = map[string]string{"iOS": "AppStore", "GooglePlay": "GooglePlay", "Samsung": "galaxyStore"}
 
 type IMailParser interface {
 	checkFrom(from string) bool
