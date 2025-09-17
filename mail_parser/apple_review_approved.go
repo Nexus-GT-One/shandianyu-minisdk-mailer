@@ -19,7 +19,7 @@ func (o *reviewApprovedMailParser) checkFrom(from string) bool {
 }
 
 func (o *reviewApprovedMailParser) checkTitle(title string) bool {
-	return strings.Contains(title, "Review of your submission is complete")
+	return strings.Contains(title, "Review of your") && strings.Contains(title, "submission is complete")
 }
 
 func (o *reviewApprovedMailParser) checkKeyword(bodyText string) bool {
