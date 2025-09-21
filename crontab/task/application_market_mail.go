@@ -4,12 +4,6 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
-	"github.com/emersion/go-imap"
-	"github.com/emersion/go-imap/client"
-	"github.com/emersion/go-message"
-	htmlcharset "golang.org/x/net/html/charset"
-	"golang.org/x/text/encoding/simplifiedchinese"
-	"golang.org/x/text/transform"
 	"io"
 	"io/ioutil"
 	"mime"
@@ -31,17 +25,26 @@ import (
 	"strings"
 	"time"
 	"unicode/utf8"
+
+	"github.com/emersion/go-imap"
+	"github.com/emersion/go-imap/client"
+	"github.com/emersion/go-message"
+	htmlcharset "golang.org/x/net/html/charset"
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/transform"
 )
 
 func init() {
-	message.CharsetReader = func(charset string, input io.Reader) (io.Reader, error) {
-		return htmlcharset.NewReaderLabel(charset, input) // 使用 x/net/html/charset 提供的解码器
-	}
+	systemutil.Goroutine(func() {
+		message.CharsetReader = func(charset string, input io.Reader) (io.Reader, error) {
+			return htmlcharset.NewReaderLabel(charset, input) // 使用 x/net/html/charset 提供的解码器
+		}
 
-	for {
-		run()
-		time.Sleep(systemutil.If(isProd, 5*time.Second, time.Second).(time.Duration))
-	}
+		for {
+			runApplicationMarketMail()
+			time.Sleep(systemutil.If(isProd, 5*time.Second, time.Second).(time.Duration))
+		}
+	})
 }
 
 // 解码邮件头，支持GBK编码等
@@ -204,7 +207,7 @@ func removeHTMLAndCSS(input string) string {
 	return strings.TrimSpace(input)
 }
 
-func run() {
+func runApplicationMarketMail() {
 	defer func() {
 		if err := recover(); err != nil {
 			title := "邮件解析错误"

@@ -3,9 +3,6 @@ package aigcbest
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/shopspring/decimal"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"reflect"
 	"runtime"
 	"shandianyu-minisdk-mailer/entity"
@@ -16,6 +13,10 @@ import (
 	"shandianyu-minisdk-mailer/util/maputil"
 	"shandianyu-minisdk-mailer/util/systemutil"
 	"strconv"
+
+	"github.com/shopspring/decimal"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type ChatCompletionResponse struct {

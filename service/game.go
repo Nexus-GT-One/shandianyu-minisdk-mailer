@@ -2,15 +2,16 @@ package service
 
 import (
 	_ "embed"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"reflect"
 	"shandianyu-minisdk-mailer/entity"
 	"shandianyu-minisdk-mailer/provider/mongodb"
 	"shandianyu-minisdk-mailer/util/arrayutil"
 	"shandianyu-minisdk-mailer/util/systemutil"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type gameService struct{}
@@ -19,6 +20,11 @@ var GameService = newGameService()
 
 func newGameService() *gameService {
 	return &gameService{}
+}
+
+func (s *gameService) ListAll() []*entity.Game {
+	ctx, cursor := db.Find(bson.D{}, entity.Game{})
+	return mongodb.DecodeList(ctx, cursor, entity.Game{})
 }
 
 func (a *gameService) GetByName(name string) *entity.Game {
