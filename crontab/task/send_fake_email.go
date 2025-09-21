@@ -51,9 +51,9 @@ func init() {
 				} else if registerDays <= 7 {
 					sendTime = now + int64(randomutil.Int(10800000, 86400000))
 				} else if registerDays <= 14 {
-					sendTime = now + int64(randomutil.Int(86400000, 86400000*3))
+					sendTime = now + int64(randomutil.Int(86400000*3, 86400000*5))
 				} else {
-					sendTime = now + int64(randomutil.Int(86400000*4, 86400000*6))
+					sendTime = now + int64(randomutil.Int(86400000*6, 86400000*14))
 				}
 				service.EmailSchedule.SaveScheduleNextSendTime(game, sendTime)
 			}
