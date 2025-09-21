@@ -3,8 +3,6 @@ package service
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/hashicorp/go-version"
-	"go.mongodb.org/mongo-driver/bson"
 	"reflect"
 	"shandianyu-minisdk-mailer/constant"
 	CheckBSideResult "shandianyu-minisdk-mailer/constant"
@@ -17,8 +15,12 @@ import (
 	"shandianyu-minisdk-mailer/util/randomutil"
 	"shandianyu-minisdk-mailer/util/secretutil"
 	"shandianyu-minisdk-mailer/util/stringutil"
+	"shandianyu-minisdk-mailer/util/systemutil"
 	"strings"
 	"time"
+
+	"github.com/hashicorp/go-version"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 type applicationService struct{}
@@ -134,6 +136,21 @@ func checkPublishedOrNot(game *entity.Game) {
 	if autoReleaseDays <= 0 {
 		// 不延迟解除审核
 		producterMessage = fmt.Sprintf("已过审，%s", hotfixStatus[isFirstPackage])
+	}
+
+	// 过审后，提醒1次正式服的热更数据是否跟测试服一致
+	if !isFirstPackage {
+		systemutil.Goroutine(func() {
+			// 选择提审版本对应的热更版本
+			hotfixVersion := ""
+			for _, hotfixObj := range GameHotfixService.List(game.Id.Hex()) {
+				if arrayutil.Contains(hotfix.AppVersion, game.PublishVersion) {
+					hotfixVersion = hotfixObj.Version
+					break
+				}
+			}
+			GameHotfixService.CompareHotfixConfig(game.Id.Hex(), hotfixVersion)
+		})
 	}
 
 	// 清空服务器缓存
