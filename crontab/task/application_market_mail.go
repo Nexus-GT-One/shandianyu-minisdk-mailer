@@ -41,7 +41,7 @@ func init() {
 		}
 
 		for {
-			runApplicationMarketMail()
+			//runApplicationMarketMail()
 			time.Sleep(systemutil.If(isProd, 5*time.Second, time.Second).(time.Duration))
 		}
 	})
