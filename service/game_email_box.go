@@ -10,7 +10,7 @@ import (
 
 type gameMailBox struct{}
 
-var GameMailBox = newGameMailBox()
+var GameMailBoxService = newGameMailBox()
 
 func newGameMailBox() *gameMailBox {
 	return &gameMailBox{}

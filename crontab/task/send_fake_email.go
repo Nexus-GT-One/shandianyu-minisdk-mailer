@@ -32,7 +32,7 @@ func init() {
 
 		// 判断达到了发送时间的就发邮件
 		now := time.Now().UnixMilli()
-		for _, schedule := range service.GameMailBox.ListAll() {
+		for _, schedule := range service.GameMailBoxService.ListAll() {
 			// 还没到发送时间
 			if schedule.SendTime <= 0 || schedule.SendTime > now {
 				continue
@@ -45,16 +45,16 @@ func init() {
 		// 发送完成后，设定下次发送时间
 		for _, game := range service.GameService.ListAll() {
 			if !game.Enable || len(game.DeveloperEmail) <= 0 {
-				service.GameMailBox.DeleteSchedule(game)
+				service.GameMailBoxService.DeleteSchedule(game)
 				continue
 			}
 
 			// 新邮箱注册7天内每天都要发一封邮件；7天后不需要再发
 			sendTime := int64(0)
 			registerDays := int((now - game.CreateTime) / 86400000)
-			schedule := service.GameMailBox.GetGameGameMailBox(game)
+			schedule := service.GameMailBoxService.GetGameGameMailBox(game)
 			if schedule == nil {
-				schedule = service.GameMailBox.SaveScheduleNextSendTime(game, sendTime)
+				schedule = service.GameMailBoxService.SaveScheduleNextSendTime(game, sendTime)
 			} else {
 				sendTime = schedule.SendTime
 			}
@@ -66,7 +66,7 @@ func init() {
 				} else {
 					sendTime = 0
 				}
-				service.GameMailBox.SaveScheduleNextSendTime(game, sendTime)
+				service.GameMailBoxService.SaveScheduleNextSendTime(game, sendTime)
 			}
 
 			if sendTime <= 0 {
