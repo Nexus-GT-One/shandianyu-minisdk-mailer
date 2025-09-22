@@ -85,7 +85,6 @@ func sendFakeEmail(game *entity.Game) {
 	password := "f3da51a030dfb484"
 
 	// 收件人
-	game.DeveloperEmail = "ruanzhijun@ruanzhijun.cn"
 	to := game.DeveloperEmail
 
 	// SMTP服务器配置
