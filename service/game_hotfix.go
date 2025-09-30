@@ -38,7 +38,7 @@ func (a *gameHotfixService) CompareHotfixConfig(gameId, version string) {
 		return
 	}
 
-	message := fmt.Sprintf("【监控消息】\n游戏 %s 已过审，热更版本 %s 正式环境和测试环境的热更配置有差异，请确认！", game.Symbol, version)
+	message := fmt.Sprintf("【监控消息】\n游戏 %s v_%s 已过审，热更版本 %s 正式环境和测试环境的热更配置有差异，请确认！", game.Symbol, game.PublishVersion, version)
 	feishu.DevRobot().SendRobotMessage(message, game.Developer...)
 }
 
