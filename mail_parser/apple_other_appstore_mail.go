@@ -12,7 +12,7 @@ import (
 type OtherAppstoreMailParser struct{}
 
 func (o *OtherAppstoreMailParser) checkFrom(from string) bool {
-	return strings.Contains(from, "App Store Connect")
+	return strings.Contains(from, "App Store") || strings.Contains(from, "Apple")
 }
 
 func (o *OtherAppstoreMailParser) checkTitle(title string) bool {
